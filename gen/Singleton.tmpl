@@ -1,0 +1,16 @@
+
+package {{ .Package }}
+
+import (
+	"sync"
+)
+
+var {{ .Struct }}_instance *{{ .Struct }}
+var {{ .Struct }}_once sync.Once
+
+func Get{{ .Struct }}Instance() *{{ .Struct }} {
+	{{ .Struct }}_once.Do(func() {
+		{{ .Struct }}_instance = &{{ .Struct }}{}
+	})
+	return {{ .Struct }}_instance
+}

@@ -1,0 +1,16 @@
+
+package {{ .Package }}
+
+type Alias = {{ .Type }}
+
+type list struct {
+    {{ range $index, $element := .Items}}
+    {{- $element }} Alias
+    {{ end}}
+}
+
+var {{ .Name }}Enum = &list{
+    {{ range $index, $element := .Items}}
+    {{- $element }} : {{ $index }},
+    {{end}}
+}
