@@ -8,22 +8,22 @@ import (
 type ItemArray []string
 
 type Enum struct {
-	*Base				`base`
-	Type *string 		`type`
-	Items *ItemArray	`items`
-	Name *string 		`name`
+	*Base `base`
+	Type  *string    `type`
+	Items *ItemArray `items`
+	Name  *string    `name`
 }
 
 func (itemArray *ItemArray) Set(value string) error {
-	*itemArray = strings.Split(value,",")
+	*itemArray = strings.Split(value, ",")
 	return nil
 }
 
 func (itemArray *ItemArray) String() string {
-	return strings.Join(*itemArray,",")
+	return strings.Join(*itemArray, ",")
 }
 
-func (enum *Enum) Create(){
+func (enum *Enum) Create() {
 	enum.Base.Create()
 
 	enum.Type = flag.String("type", "int", "枚举值类型！")
@@ -33,14 +33,10 @@ func (enum *Enum) Create(){
 
 }
 
-func (enum *Enum) Execute(name string,data interface{}) {
-	enum.Base.Execute(name,data)
-}
-
 func main() {
 	enum := &Enum{}
 	enum.Base = &Base{}
 	enum.Create()
 	enum.Parse()
-	enum.Execute(GetType(enum),enum)
+	enum.Append(GetType(enum), enum)
 }
