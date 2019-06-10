@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"gsm/controller"
 )
 
@@ -14,11 +13,5 @@ func NewTestController() *TestController {
 }
 
 func (testController *TestController) Initialize() {
-	testController.Register("Test", func() interface{} {
-		return testController.Test
-	})
-}
 
-func (testController *TestController) Test(num int) {
-	fmt.Println(num)
 }

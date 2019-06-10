@@ -62,7 +62,7 @@ func (application *Application) SetLogConfig(config *logger.LogConfig) {
 func (application *Application) SetNetConfig(config *network.NetConfig) {
 	config.BufferSize = 50
 	config.Address = "127.0.0.1"
-	config.Port = 8888
+	config.Port = 8889
 	config.ConnectTimeout = 3
 }
 

@@ -1,36 +1,36 @@
 package modules
 
 import (
-	"example/client/controllers"
+	"example/server/controllers"
 	"gsc/logger"
 	"gsf/peer"
 	"gsf/service"
 	"gsm/module"
 )
 
-type TestModule struct {
+type TestServerModule struct {
 	*module.Module
 }
 
-func NewTestModule() *TestModule {
-	return &TestModule{
+func NewTestServerModule() *TestServerModule {
+	return &TestServerModule{
 		Module: module.NewModule(),
 	}
 }
 
-func (testModule *TestModule) Initialize(service service.IService) {
+func (testModule *TestServerModule) Initialize(service service.IService) {
 	testModule.Module.Initialize(service)
 
 	testModule.AddController(controllers.NewTestController())
 	logger.Log.Debug("Initialize")
 }
 
-func (testModule *TestModule) Connected(peer peer.IPeer) {
-	logger.Log.Debug("Connected")
-}
-
-func (testModule *TestModule) InitializeFinish(service service.IService) {
+func (testModule *TestServerModule) InitializeFinish(service service.IService) {
 	testModule.Module.InitializeFinish(service)
 
 	logger.Log.Debug("InitializeFinish")
+}
+
+func (testModule *TestServerModule) Connected(peer peer.IPeer) {
+	logger.Log.Debug("Connected")
 }

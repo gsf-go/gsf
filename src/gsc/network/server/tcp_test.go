@@ -8,8 +8,7 @@ import (
 )
 
 func TestTcp(t *testing.T) {
-	config := network.NewConfig()
-	config.BufferLength = 64
+	config := network.NewNetConfig()
 	config.BufferSize = 10
 	config.Address = "127.0.0.1"
 	config.Port = 8888

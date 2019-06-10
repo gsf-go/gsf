@@ -56,10 +56,6 @@ func (tcpClient *TcpClient) Connect(config *network.NetConfig) {
 		return
 	}
 
-	if tcpClient.OnConnected != nil {
-		tcpClient.OnConnected(connection)
-	}
-
 	tcpClient._close = func() {
 		if conn != nil {
 			_ = conn.Close()
@@ -93,6 +89,10 @@ func (tcpClient *TcpClient) Connect(config *network.NetConfig) {
 			tcpClient.close(reason)
 		}
 	}()
+
+	if tcpClient.OnConnected != nil {
+		tcpClient.OnConnected(connection)
+	}
 }
 
 func (tcpClient *TcpClient) read(

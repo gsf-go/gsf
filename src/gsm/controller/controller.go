@@ -25,15 +25,83 @@ func (controller *Controller) Register(name string, function func() interface{})
 		})
 }
 
-func (controller *Controller) Invoke(name string, peer peer.IPeer, function func() []interface{}) {
-	if len(name) == 0 || function == nil {
-		return
+func (controller *Controller) Invoke(
+	name string,
+	peer peer.IPeer,
+	args func() []interface{}) []interface{} {
+
+	if len(name) == 0 || args == nil {
+		return nil
 	}
 
+	resultChan := make(chan []interface{})
+	defer func() {
+		close(resultChan)
+	}()
+
+	rpcRegister := rpc.GetRpcRegisterInstance()
+	rpcRegister.Add("#"+name,
+		func(values []reflect.Value) []reflect.Value {
+
+			response := make([]interface{}, len(values))
+			for i, item := range values {
+				response[i] = item.Interface()
+			}
+
+			defer func() {
+				rpcRegister.Remove("#" + name)
+				resultChan <- response
+			}()
+			return values
+		})
+
 	rpcInvoke := rpc.NewRpcInvoke()
-	bytes := rpcInvoke.Request(name, function()...)
+	bytes := rpcInvoke.Request(name, args()...)
 	connection := peer.GetConnection()
 	if connection != nil {
 		connection.Send(bytes)
 	}
+
+	select {
+	case result := <-resultChan:
+		return result
+	}
+
+}
+
+func (controller *Controller) AsyncInvoke(
+	name string,
+	peer peer.IPeer,
+	args func() []interface{},
+	result func([]interface{})) {
+
+	if len(name) == 0 || args == nil {
+		return
+	}
+
+	rpcRegister := rpc.GetRpcRegisterInstance()
+	rpcRegister.Add("#"+name,
+		func(values []reflect.Value) []reflect.Value {
+
+			response := make([]interface{}, len(values))
+			for i, item := range values {
+				response[i] = item.Interface()
+			}
+
+			defer func() {
+				rpcRegister.Remove("#" + name)
+				if result != nil {
+					result(response)
+				}
+			}()
+			return values
+		})
+
+	rpcInvoke := rpc.NewRpcInvoke()
+	bytes := rpcInvoke.Request(name, args()...)
+	connection := peer.GetConnection()
+	if connection != nil {
+		connection.Send(bytes)
+	}
+
 }

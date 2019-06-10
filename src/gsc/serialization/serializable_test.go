@@ -12,7 +12,7 @@ func Show(t *testing.T, args ...interface{}) {
 	ser := new(Serializable)
 	deser := new(Deserializable)
 
-	bytes := ser.Serialize(args)
+	bytes := ser.Serialize(args...)
 	value := deser.Deserialize(bytes)
 	t.Log(value)
 }

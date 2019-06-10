@@ -6,33 +6,35 @@ import (
 	"gsf/peer"
 	"gsf/service"
 	"gsm/module"
+	"strconv"
 )
 
-type TestModule struct {
+type TestClientModule struct {
 	*module.Module
 }
 
-func NewTestModule() *TestModule {
-	return &TestModule{
+func NewTestClientModule() *TestClientModule {
+	return &TestClientModule{
 		Module: module.NewModule(),
 	}
 }
 
-func (testModule *TestModule) Initialize(service service.IService) {
+func (testModule *TestClientModule) Initialize(service service.IService) {
 	testModule.Module.Initialize(service)
 
 	testModule.AddController(controllers.NewTestController())
 	logger.Log.Debug("Initialize")
 }
 
-func (testModule *TestModule) Connected(peer peer.IPeer) {
+func (testModule *TestClientModule) Connected(peer peer.IPeer) {
 	controller := controllers.NewTestController()
-	controller.Invoke("Test", peer, func() []interface{} {
+	result := controller.Invoke("Test", peer, func() []interface{} {
 		return []interface{}{10000}
 	})
+	logger.Log.Debug(strconv.Itoa(result[0].(int)))
 }
 
-func (testModule *TestModule) InitializeFinish(service service.IService) {
+func (testModule *TestClientModule) InitializeFinish(service service.IService) {
 	testModule.Module.InitializeFinish(service)
 
 	logger.Log.Debug("InitializeFinish")

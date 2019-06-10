@@ -14,7 +14,7 @@ func TestServerSocket(t *testing.T) {
 	config := network.NewNetConfig()
 	config.BufferSize = 50
 	config.Address = "127.0.0.1"
-	config.Port = 8888
+	config.Port = 8889
 	config.ConnectTimeout = 3
 
 	rpc.GetRpcRegisterInstance().Add("Func",
@@ -36,16 +36,14 @@ func TestServerSocket(t *testing.T) {
 		connection.Send(ret)
 	}
 
+	rpc.GetRpcRegisterInstance().Add("#Func", func(values []reflect.Value) []reflect.Value {
+		Func := func(str string) {
+			t.Log(str)
+		}
+		return reflect.ValueOf(Func).Call(values)
+	})
+
 	clientSocket.OnMessage = func(peer peer.IPeer, data []byte) {
-
-		rpc.GetRpcRegisterInstance().Remove("Func")
-		rpc.GetRpcRegisterInstance().Add("Func", func(values []reflect.Value) []reflect.Value {
-			Func := func(str string) {
-				t.Log(str)
-			}
-			return reflect.ValueOf(Func).Call(values)
-		})
-
 		response := rpc.NewRpcResponse()
 		response.Response(data)
 	}

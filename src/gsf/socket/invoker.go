@@ -3,6 +3,7 @@ package socket
 import (
 	"gsc/rpc"
 	"gsf/peer"
+	"strings"
 	"sync"
 )
 
@@ -34,8 +35,12 @@ func (invoker *invoker) Invoke(peer peer.IPeer, data []byte) {
 		values[i] = item.Interface()
 	}
 
+	if strings.Contains(messageId, "#") {
+		return
+	}
+
 	invoke := rpc.NewRpcInvoke()
-	bytes := invoke.Request(messageId, values...)
+	bytes := invoke.Request("#"+messageId, values...)
 	connection := peer.GetConnection()
 	if connection != nil {
 		connection.Send(bytes)

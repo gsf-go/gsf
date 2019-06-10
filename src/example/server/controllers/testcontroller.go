@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"gsc/logger"
 	"gsm/controller"
 )
 
@@ -19,6 +18,6 @@ func (testController *TestController) Initialize() {
 	})
 }
 
-func (testController *TestController) Test(num int) {
-	logger.Log.Debug(string(num))
+func (testController *TestController) Test(num int) int {
+	return num + 10000
 }

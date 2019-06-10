@@ -8,7 +8,9 @@ import (
 	"gsf/service"
 	"gsf/socket"
 	"gsm/module"
-	"time"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 type IApplication interface {
@@ -33,8 +35,6 @@ func RunServer(application IApplication, args []string) {
 	moduleInitialize(s, moduleManager)
 	moduleConnectInitialize(serverSocket.Event, moduleManager)
 	s.StartServer(netConfig)
-
-	time.Sleep(3600 * time.Second)
 }
 
 func RunClient(application IApplication, args []string) {
@@ -52,8 +52,19 @@ func RunClient(application IApplication, args []string) {
 	moduleInitialize(s, moduleManager)
 	moduleConnectInitialize(clientSocket.Event, moduleManager)
 	s.Connect(netConfig)
+}
 
-	time.Sleep(3600 * time.Second)
+func shutdown(callback func()) {
+	s := make(chan os.Signal, 1)
+	signal.Notify(s, os.Interrupt)
+	signal.Notify(s, syscall.SIGTERM)
+	go func() {
+		<-s
+		if callback != nil {
+			callback()
+		}
+		os.Exit(0)
+	}()
 }
 
 func moduleConnectInitialize(event *socket.Event, moduleManager *module.ModuleManager) {
