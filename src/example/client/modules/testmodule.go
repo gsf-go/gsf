@@ -31,7 +31,14 @@ func (testModule *TestClientModule) Connected(peer peer.IPeer) {
 	result := controller.Invoke("Test", peer, func() []interface{} {
 		return []interface{}{10000}
 	})
+
 	logger.Log.Debug(strconv.Itoa(result[0].(int)))
+
+	controller.AsyncInvoke("Test", peer, func() []interface{} {
+		return []interface{}{10000}
+	}, func(result []interface{}) {
+		logger.Log.Debug(strconv.Itoa(result[0].(int)))
+	})
 }
 
 func (testModule *TestClientModule) InitializeFinish(service service.IService) {

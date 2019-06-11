@@ -1,6 +1,7 @@
 package rpc
 
 import (
+	"gsf/peer"
 	"reflect"
 	"sync"
 )
@@ -19,16 +20,17 @@ func GetRpcRegisterInstance() *rpcRegister {
 
 type rpcRegister struct {
 	rwMutex sync.RWMutex
-	cache   map[string]func([]reflect.Value) []reflect.Value
+	cache   map[string]func(peer peer.IPeer, values []reflect.Value) []reflect.Value
 }
 
 func NewRpcRegister() *rpcRegister {
 	return &rpcRegister{
-		cache: make(map[string]func([]reflect.Value) []reflect.Value),
+		cache: make(map[string]func(peer peer.IPeer, values []reflect.Value) []reflect.Value),
 	}
 }
 
-func (rpcRegister *rpcRegister) Add(name string, method func([]reflect.Value) []reflect.Value) {
+func (rpcRegister *rpcRegister) Add(name string,
+	method func(peer peer.IPeer, values []reflect.Value) []reflect.Value) {
 	rpcRegister.rwMutex.Lock()
 	defer func() {
 		rpcRegister.rwMutex.Unlock()
@@ -46,7 +48,7 @@ func (rpcRegister *rpcRegister) Remove(name string) {
 	delete(rpcRegister.cache, name)
 }
 
-func (rpcRegister *rpcRegister) GetRpcByName(name string) func([]reflect.Value) []reflect.Value {
+func (rpcRegister *rpcRegister) GetRpcByName(name string) func(peer peer.IPeer, values []reflect.Value) []reflect.Value {
 	rpcRegister.rwMutex.RLock()
 	defer func() {
 		rpcRegister.rwMutex.RUnlock()

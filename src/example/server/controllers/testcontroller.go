@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"gsf/peer"
 	"gsm/controller"
 )
 
@@ -18,6 +19,6 @@ func (testController *TestController) Initialize() {
 	})
 }
 
-func (testController *TestController) Test(num int) int {
+func (testController *TestController) Test(num int, peer peer.IPeer) int {
 	return num + 10000
 }

@@ -28,7 +28,7 @@ func NewInvoker() *invoker {
 
 func (invoker *invoker) Invoke(peer peer.IPeer, data []byte) {
 	response := rpc.NewRpcResponse()
-	messageId, ret := response.Response(data)
+	messageId, ret := response.Response(peer, data)
 
 	values := make([]interface{}, len(ret))
 	for i, item := range ret {

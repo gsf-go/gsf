@@ -2,11 +2,12 @@ package rpc
 
 import (
 	"gsc/serialization"
+	"gsf/peer"
 	"reflect"
 )
 
 type IRpcInvoke interface {
-	Invoke(methodId string, args ...interface{}) []reflect.Value
+	Invoke(methodId string, peer peer.IPeer, args ...interface{}) []reflect.Value
 	Request(methodId string, args ...interface{}) []byte
 }
 
@@ -20,7 +21,7 @@ func NewRpcInvoke() *RpcInvoke {
 	}
 }
 
-func (rpcInvoke *RpcInvoke) Invoke(methodId string, args ...interface{}) []reflect.Value {
+func (rpcInvoke *RpcInvoke) Invoke(methodId string, peer peer.IPeer, args ...interface{}) []reflect.Value {
 
 	method := GetRpcRegisterInstance().GetRpcByName(methodId)
 	values := make([]reflect.Value, len(args))
@@ -30,7 +31,7 @@ func (rpcInvoke *RpcInvoke) Invoke(methodId string, args ...interface{}) []refle
 		values[i] = v
 	}
 
-	return method(values)
+	return method(peer, values)
 }
 
 func (rpcInvoke *RpcInvoke) Request(methodId string, args ...interface{}) []byte {

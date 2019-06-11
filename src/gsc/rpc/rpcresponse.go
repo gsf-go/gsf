@@ -3,11 +3,12 @@ package rpc
 import (
 	"gsc/logger"
 	"gsc/serialization"
+	"gsf/peer"
 	"reflect"
 )
 
 type IRpcResponse interface {
-	Response(data []byte) (string, []reflect.Value)
+	Response(peer peer.IPeer, data []byte) (string, []reflect.Value)
 }
 
 type RpcResponse struct {
@@ -20,7 +21,7 @@ func NewRpcResponse() *RpcResponse {
 	}
 }
 
-func (rpcResponse *RpcResponse) Response(data []byte) (string, []reflect.Value) {
+func (rpcResponse *RpcResponse) Response(peer peer.IPeer, data []byte) (string, []reflect.Value) {
 	result := rpcResponse.deserializable.Deserialize(data)
 	messageId := result[0].String()
 	method := GetRpcRegisterInstance().GetRpcByName(messageId)
@@ -28,5 +29,5 @@ func (rpcResponse *RpcResponse) Response(data []byte) (string, []reflect.Value) 
 		logger.Log.Error("没有注册ID:" + messageId + "的RPC")
 		return messageId, nil
 	}
-	return messageId, method(result[1:])
+	return messageId, method(peer, result[1:])
 }
