@@ -18,7 +18,7 @@ func TestServerSocket(t *testing.T) {
 	config.ConnectTimeout = 3
 
 	rpc.GetRpcRegisterInstance().Add("Func",
-		func(args []reflect.Value) []reflect.Value {
+		func(peer peer.IPeer, args []reflect.Value) []reflect.Value {
 			Func := func(num int, str string) string {
 				return strconv.Itoa(num) + " " + str
 			}
@@ -36,7 +36,7 @@ func TestServerSocket(t *testing.T) {
 		connection.Send(ret)
 	}
 
-	rpc.GetRpcRegisterInstance().Add("#Func", func(values []reflect.Value) []reflect.Value {
+	rpc.GetRpcRegisterInstance().Add("#Func", func(peer peer.IPeer, values []reflect.Value) []reflect.Value {
 		Func := func(str string) {
 			t.Log(str)
 		}
@@ -45,7 +45,7 @@ func TestServerSocket(t *testing.T) {
 
 	clientSocket.OnMessage = func(peer peer.IPeer, data []byte) {
 		response := rpc.NewRpcResponse()
-		response.Response(data)
+		response.Response(peer, data)
 	}
 	clientSocket.Connect(config)
 	time.Sleep(time.Second * 5)
