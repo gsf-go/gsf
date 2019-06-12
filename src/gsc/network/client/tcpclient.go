@@ -102,7 +102,7 @@ func (tcpClient *TcpClient) read(
 	errChan chan<- func() (network.IConnection, error, string),
 	connection network.IConnection) {
 
-	offset := int32(0)
+	offset := uint16(0)
 
 	for {
 		select {
@@ -136,7 +136,7 @@ func (tcpClient *TcpClient) read(
 			offset += tcpClient.handleData(
 				config,
 				connection,
-				buffer[0:int32(n)+offset])
+				buffer[0:uint16(n)+offset])
 		}
 	}
 
@@ -158,7 +158,7 @@ func (tcpClient *TcpClient) close(reason string) {
 func (tcpClient *TcpClient) handleData(
 	config *network.NetConfig,
 	connection network.IConnection,
-	buffer []byte) int32 {
+	buffer []byte) uint16 {
 
 	packet := &network.Packet{
 		Config: config,

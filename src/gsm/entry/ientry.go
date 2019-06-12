@@ -5,5 +5,5 @@ import (
 )
 
 type IEntry interface {
-	Mian() module.IModule
+	Main() module.IModule
 }

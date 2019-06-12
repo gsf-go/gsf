@@ -1,6 +1,7 @@
 package module
 
 import (
+	"gsc/serialization"
 	"gsf/peer"
 	"gsf/service"
 	"gsm/controller"
@@ -21,8 +22,8 @@ func (module *Module) AddController(controller controller.IController) {
 	controller.Initialize()
 }
 
-func (module *Module) AddModel(service service.IService) {
-
+func (module *Module) AddModel(name string, generate func() serialization.ISerializablePacket) {
+	serialization.GetPacketManagerInstance().AddPacket(name, generate)
 }
 
 func (module *Module) Initialize(service service.IService) {

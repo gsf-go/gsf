@@ -76,6 +76,18 @@ func (byteWriter *ByteWriter) Write(data interface{}) {
 		}
 	case nil:
 		return
+	case []byte:
+		length := uint16(len(data) + binary.Size(uint16(0)))
+		err := binary.Write(byteWriter.buffer, byteWriter.Order, length)
+		if err != nil {
+			panic(err)
+		}
+
+		bytes := []byte(data)
+		err = binary.Write(byteWriter.buffer, byteWriter.Order, bytes)
+		if err != nil {
+			panic(err)
+		}
 	default:
 		err := binary.Write(byteWriter.buffer, byteWriter.Order, data)
 		if err != nil {

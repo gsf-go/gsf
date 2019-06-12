@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"example/server/models"
+	"gsc/logger"
 	"gsf/peer"
 	"gsm/controller"
 )
@@ -19,6 +21,7 @@ func (testController *TestController) Initialize() {
 	})
 }
 
-func (testController *TestController) Test(num int, peer peer.IPeer) int {
+func (testController *TestController) Test(num int, testmodel *models.TestModel, peer peer.IPeer) int {
+	logger.Log.Debug(testmodel.Name)
 	return num + 10000
 }

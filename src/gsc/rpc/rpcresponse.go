@@ -12,12 +12,12 @@ type IRpcResponse interface {
 }
 
 type RpcResponse struct {
-	deserializable serialization.IDeserializable
+	deserializable *serialization.Deserializable
 }
 
 func NewRpcResponse() *RpcResponse {
 	return &RpcResponse{
-		deserializable: new(serialization.Deserializable),
+		deserializable: serialization.NewDeserializable(),
 	}
 }
 

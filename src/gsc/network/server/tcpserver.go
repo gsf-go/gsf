@@ -106,7 +106,7 @@ func (tcpServer *TcpServer) handleClient(
 	}()
 
 	byteArray := buffer.Bytes()
-	offset := int32(0)
+	offset := uint16(0)
 
 	for {
 		n, err := conn.Read(byteArray[offset:])
@@ -137,14 +137,14 @@ func (tcpServer *TcpServer) handleClient(
 		offset += tcpServer.handleData(
 			config,
 			connection,
-			byteArray[0:int32(n)+offset])
+			byteArray[0:uint16(n)+offset])
 	}
 }
 
 func (tcpServer *TcpServer) handleData(
 	config *network.NetConfig,
 	connection network.IConnection,
-	buffer []byte) int32 {
+	buffer []byte) uint16 {
 
 	packet := &network.Packet{
 		Config: config,

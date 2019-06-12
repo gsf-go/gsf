@@ -33,7 +33,7 @@ func (controller *Controller) Register(name string, function func() interface{})
 		func(p peer.IPeer, values []reflect.Value) []reflect.Value {
 			if index > 0 {
 				values = append(values, make([]reflect.Value, 1)...)
-				values = append(values[:index+1], values[index:]...)
+				values = append(values[:index], values[index:]...)
 				values[index] = reflect.ValueOf(p)
 			}
 			return method.Call(values)

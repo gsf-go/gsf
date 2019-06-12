@@ -2,7 +2,9 @@ package modules
 
 import (
 	"example/server/controllers"
+	"example/server/models"
 	"gsc/logger"
+	"gsc/serialization"
 	"gsf/peer"
 	"gsf/service"
 	"gsm/module"
@@ -22,6 +24,9 @@ func (testModule *TestServerModule) Initialize(service service.IService) {
 	testModule.Module.Initialize(service)
 
 	testModule.AddController(controllers.NewTestController())
+	testModule.AddModel("TestModel", func() serialization.ISerializablePacket {
+		return new(models.TestModel)
+	})
 	logger.Log.Debug("Initialize")
 }
 

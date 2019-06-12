@@ -17,7 +17,7 @@ type RpcInvoke struct {
 
 func NewRpcInvoke() *RpcInvoke {
 	return &RpcInvoke{
-		serializable: new(serialization.Serializable),
+		serializable: serialization.NewSerializable(),
 	}
 }
 

@@ -9,7 +9,7 @@ import (
 
 func TestTcp(t *testing.T) {
 	config := network.NewNetConfig()
-	config.BufferSize = 10
+	config.BufferSize = 1024
 	config.Address = "127.0.0.1"
 	config.Port = 8888
 	config.ConnectTimeout = 3

@@ -79,7 +79,7 @@ func (udpServer *udpServer) handleClient(
 			buffer := bufferPool.GetBuffer()
 
 			byteArray := buffer.Bytes()
-			var offset int32 = 0
+			offset := uint16(0)
 
 			n, addr, err := packetConn.ReadFrom(byteArray[offset:])
 			connection := udpServer.connectionPool.GetConnection(addr.String())
@@ -121,7 +121,8 @@ func (udpServer *udpServer) handleClient(
 				return
 			}
 
-			offset += udpServer.handleData(config, connection, byteArray[0:int32(n)+offset])
+			offset += udpServer.handleData(config, connection,
+				byteArray[0:uint16(n)+offset])
 		}
 	}
 }
@@ -129,7 +130,7 @@ func (udpServer *udpServer) handleClient(
 func (udpServer *udpServer) handleData(
 	config *network.NetConfig,
 	connection network.IConnection,
-	buffer []byte) int32 {
+	buffer []byte) uint16 {
 
 	packet := &network.Packet{
 		Config: config,

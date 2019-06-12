@@ -34,7 +34,6 @@ func (byteReader *ByteReader) IsEOF() bool {
 }
 
 func (byteReader *ByteReader) Read(data interface{}) {
-
 	switch data := data.(type) {
 	case *int:
 		var v int32 = 0
@@ -66,10 +65,27 @@ func (byteReader *ByteReader) Read(data interface{}) {
 		if err != nil {
 			panic(err)
 		}
+
 		*data = string(bytes)
 	case *interface{}:
 		return
 
+	case *[]byte:
+		length := uint16(0)
+		err := binary.Read(byteReader.reader, byteReader.Order, &length)
+		if err != nil {
+			panic(err)
+		}
+
+		dataLength := int(length) - binary.Size(uint16(0))
+		bytes := make([]byte, dataLength)
+
+		err = binary.Read(byteReader.reader, byteReader.Order, bytes)
+		if err != nil {
+			panic(err)
+		}
+
+		*data = bytes
 	default:
 		err := binary.Read(byteReader.reader, byteReader.Order, data)
 		if err != nil {
