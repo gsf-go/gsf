@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"gsm/controller"
+	"github.com/gsf/gsf/src/gsm/controller"
 )
 
 type TestController struct {

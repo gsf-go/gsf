@@ -1,13 +1,13 @@
 package modules
 
 import (
-	"example/client/controllers"
-	"example/client/models"
-	"gsc/logger"
-	"gsc/serialization"
-	"gsf/peer"
-	"gsf/service"
-	"gsm/module"
+	"github.com/gsf/gsf/src/example/client/controllers"
+	"github.com/gsf/gsf/src/example/client/models"
+	"github.com/gsf/gsf/src/gsc/logger"
+	"github.com/gsf/gsf/src/gsc/serialization"
+	"github.com/gsf/gsf/src/gsf/peer"
+	"github.com/gsf/gsf/src/gsf/service"
+	"github.com/gsf/gsf/src/gsm/module"
 	"strconv"
 )
 

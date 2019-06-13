@@ -1,13 +1,13 @@
 package modules
 
 import (
-	"example/server/controllers"
-	"example/server/models"
-	"gsc/logger"
-	"gsc/serialization"
-	"gsf/peer"
-	"gsf/service"
-	"gsm/module"
+	"github.com/gsf/gsf/src/example/server/controllers"
+	"github.com/gsf/gsf/src/example/server/models"
+	"github.com/gsf/gsf/src/gsc/logger"
+	"github.com/gsf/gsf/src/gsc/serialization"
+	"github.com/gsf/gsf/src/gsf/peer"
+	"github.com/gsf/gsf/src/gsf/service"
+	"github.com/gsf/gsf/src/gsm/module"
 )
 
 type TestServerModule struct {

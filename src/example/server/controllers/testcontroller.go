@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"example/server/models"
-	"gsc/logger"
-	"gsf/peer"
-	"gsm/controller"
+	"github.com/gsf/gsf/src/example/server/models"
+	"github.com/gsf/gsf/src/gsc/logger"
+	"github.com/gsf/gsf/src/gsf/peer"
+	"github.com/gsf/gsf/src/gsm/controller"
 )
 
 type TestController struct {
