@@ -2,8 +2,8 @@ package client
 
 import (
 	"context"
-	"gsc/logger"
-	"gsc/network"
+	"github.com/gsf/gsf/src/gsc/logger"
+	"github.com/gsf/gsf/src/gsc/network"
 	"net"
 	"strconv"
 	"time"

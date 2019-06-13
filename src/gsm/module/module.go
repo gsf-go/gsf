@@ -1,10 +1,10 @@
 package module
 
 import (
-	"gsc/serialization"
-	"gsf/peer"
-	"gsf/service"
-	"gsm/controller"
+	"github.com/gsf/gsf/src/gsc/serialization"
+	"github.com/gsf/gsf/src/gsf/peer"
+	"github.com/gsf/gsf/src/gsf/service"
+	"github.com/gsf/gsf/src/gsm/controller"
 )
 
 type Module struct {
@@ -31,10 +31,6 @@ func (module *Module) Initialize(service service.IService) {
 }
 
 func (module *Module) InitializeFinish(service service.IService) {
-
-}
-
-func (module *Module) Accepted(peer peer.IPeer) {
 
 }
 

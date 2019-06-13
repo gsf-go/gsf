@@ -1,8 +1,8 @@
 package socket
 
 import (
-	"gsc/network"
-	"gsf/peer"
+	"github.com/gsf/gsf/src/gsc/network"
+	"github.com/gsf/gsf/src/gsf/peer"
 )
 
 type Event struct {

@@ -1,9 +1,9 @@
 package service
 
 import (
-	"gsc/network"
-	"gsf/peer"
-	"gsf/socket"
+	"github.com/gsf/gsf/src/gsc/network"
+	"github.com/gsf/gsf/src/gsf/peer"
+	"github.com/gsf/gsf/src/gsf/socket"
 	"sync"
 )
 

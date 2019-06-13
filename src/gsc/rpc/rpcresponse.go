@@ -1,9 +1,9 @@
 package rpc
 
 import (
-	"gsc/logger"
-	"gsc/serialization"
-	"gsf/peer"
+	"github.com/gsf/gsf/src/gsc/logger"
+	"github.com/gsf/gsf/src/gsc/serialization"
+	"github.com/gsf/gsf/src/gsf/peer"
 	"reflect"
 )
 

@@ -1,7 +1,7 @@
 package network
 
 import (
-	"gsc/bytestream"
+	"github.com/gsf/gsf/src/gsc/bytestream"
 )
 
 type HandleCallback func(connection IConnection, data []byte)

@@ -1,13 +1,12 @@
 package gsm
 
 import (
-	"example/client/controllers"
-	"gsc/crypto"
-	"gsc/logger"
-	"gsc/network"
-	"gsf/peer"
-	"gsf/service"
-	"gsm/module"
+	"github.com/gsf/gsf/src/gsc/crypto"
+	"github.com/gsf/gsf/src/gsc/logger"
+	"github.com/gsf/gsf/src/gsc/network"
+	"github.com/gsf/gsf/src/gsf/peer"
+	"github.com/gsf/gsf/src/gsf/service"
+	"github.com/gsf/gsf/src/gsm/module"
 	"testing"
 	"time"
 )
@@ -25,7 +24,6 @@ func NewTestModule() *TestModule {
 func (testModule *TestModule) Initialize(service service.IService) {
 	testModule.Module.Initialize(service)
 
-	testModule.AddController(controllers.NewTestController())
 	logger.Log.Debug("Initialize")
 }
 

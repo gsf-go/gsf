@@ -1,8 +1,8 @@
 package controller
 
 import (
-	"gsc/rpc"
-	"gsf/peer"
+	"github.com/gsf/gsf/src/gsc/rpc"
+	"github.com/gsf/gsf/src/gsf/peer"
 	"reflect"
 )
 

@@ -16,6 +16,7 @@ func NewTestController() *TestController {
 }
 
 func (testController *TestController) Initialize() {
+	testController.Controller.Initialize()
 	testController.Register("Test", func() interface{} {
 		return testController.Test
 	})

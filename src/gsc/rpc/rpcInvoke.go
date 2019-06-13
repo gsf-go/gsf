@@ -1,8 +1,8 @@
 package rpc
 
 import (
-	"gsc/serialization"
-	"gsf/peer"
+	"github.com/gsf/gsf/src/gsc/serialization"
+	"github.com/gsf/gsf/src/gsf/peer"
 	"reflect"
 )
 

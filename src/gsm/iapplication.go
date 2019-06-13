@@ -1,13 +1,13 @@
 package gsm
 
 import (
-	"gsc/crypto"
-	"gsc/logger"
-	"gsc/network"
-	"gsf/peer"
-	"gsf/service"
-	"gsf/socket"
-	"gsm/module"
+	"github.com/gsf/gsf/src/gsc/crypto"
+	"github.com/gsf/gsf/src/gsc/logger"
+	"github.com/gsf/gsf/src/gsc/network"
+	"github.com/gsf/gsf/src/gsf/peer"
+	"github.com/gsf/gsf/src/gsf/service"
+	"github.com/gsf/gsf/src/gsf/socket"
+	"github.com/gsf/gsf/src/gsm/module"
 	"os"
 	"os/signal"
 	"syscall"
@@ -26,6 +26,7 @@ func RunServer(application IApplication, args []string) {
 	logConfig := logger.NewLogConfig()
 
 	application.SetLogConfig(logConfig)
+	logger.Log.SetConfig(logConfig)
 	application.SetNetConfig(netConfig)
 	application.SetCryptoConfig(crypto.NewCryptoConfig())
 	application.RegisterModule(moduleManager)

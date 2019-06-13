@@ -1,7 +1,7 @@
 package network
 
 import (
-	"gsc/logger"
+	"github.com/gsf/gsf/src/gsc/logger"
 )
 
 type IConnection interface {

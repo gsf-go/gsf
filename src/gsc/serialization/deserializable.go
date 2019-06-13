@@ -1,7 +1,7 @@
 package serialization
 
 import (
-	"gsc/bytestream"
+	"github.com/gsf/gsf/src/gsc/bytestream"
 	"reflect"
 )
 

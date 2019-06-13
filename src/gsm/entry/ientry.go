@@ -1,7 +1,7 @@
 package entry
 
 import (
-	"gsm/module"
+	"github.com/gsf/gsf/src/gsm/module"
 )
 
 type IEntry interface {

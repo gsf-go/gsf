@@ -1,8 +1,8 @@
 package peer
 
 import (
-	"gsc/network"
-	"gsm/component"
+	"github.com/gsf/gsf/src/gsc/network"
+	"github.com/gsf/gsf/src/gsm/component"
 	"sync"
 )
 

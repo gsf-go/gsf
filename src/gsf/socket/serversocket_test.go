@@ -1,9 +1,9 @@
 package socket
 
 import (
-	"gsc/network"
-	"gsc/rpc"
-	"gsf/peer"
+	"github.com/gsf/gsf/src/gsc/network"
+	"github.com/gsf/gsf/src/gsc/rpc"
+	"github.com/gsf/gsf/src/gsf/peer"
 	"reflect"
 	"strconv"
 	"testing"

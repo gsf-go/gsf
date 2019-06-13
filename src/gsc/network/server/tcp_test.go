@@ -1,8 +1,8 @@
 package server
 
 import (
-	"gsc/network"
-	"gsc/network/client"
+	"github.com/gsf/gsf/src/gsc/network"
+	"github.com/gsf/gsf/src/gsc/network/client"
 	"testing"
 	"time"
 )

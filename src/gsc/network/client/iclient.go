@@ -1,7 +1,7 @@
 package client
 
 import (
-	"gsc/network"
+	"github.com/gsf/gsf/src/gsc/network"
 )
 
 type IClient interface {

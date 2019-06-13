@@ -1,10 +1,10 @@
 package socket
 
 import (
-	"gsc/network"
-	"gsc/network/client"
-	"gsc/pool"
-	"gsf/peer"
+	"github.com/gsf/gsf/src/gsc/network"
+	"github.com/gsf/gsf/src/gsc/network/client"
+	"github.com/gsf/gsf/src/gsc/pool"
+	"github.com/gsf/gsf/src/gsf/peer"
 )
 
 type ClientSocket struct {

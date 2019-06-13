@@ -5,25 +5,32 @@ import (
 	"os"
 )
 
-type (
-	Logger interface {
-		Debug(format string, args ...interface{})
-		Info(format string, args ...interface{})
-		Warning(format string, args ...interface{})
-		Error(format string, args ...interface{})
-		Fatal(format string, args ...interface{})
-	}
+type Logger struct {
+	debug   *log.Logger
+	info    *log.Logger
+	warning *log.Logger
+	error   *log.Logger
+	fatal   *log.Logger
 
-	consoleLogger struct {
-		debug   *log.Logger
-		info    *log.Logger
-		warning *log.Logger
-		error   *log.Logger
-		fatal   *log.Logger
-	}
-)
+	logChan chan func()
+}
 
-var Log Logger
+func (logger *Logger) SetConfig(config *LogConfig) {
+	logger.logChan = make(chan func(), config.Capacity)
+
+	go func() {
+		for {
+			select {
+			case l := <-logger.logChan:
+				if l != nil {
+					l()
+				}
+			}
+		}
+	}()
+}
+
+var Log *Logger
 
 const (
 	CLR_0 = "\x1b[30;1m"
@@ -38,12 +45,11 @@ const (
 )
 
 func init() {
-	Log = NewConsoleLogger()
-
+	Log = NewLogger()
 }
 
-func NewConsoleLogger() Logger {
-	return &consoleLogger{
+func NewLogger() *Logger {
+	return &Logger{
 		debug:   log.New(os.Stdout, CLR_0, log.Ldate|log.Ltime|log.Lmicroseconds|log.Lshortfile),
 		info:    log.New(os.Stdout, CLR_G, log.Ldate|log.Ltime|log.Lmicroseconds|log.Lshortfile),
 		warning: log.New(os.Stdout, CLR_Y, log.Ldate|log.Ltime|log.Lmicroseconds|log.Lshortfile),
@@ -52,22 +58,32 @@ func NewConsoleLogger() Logger {
 	}
 }
 
-func (logger *consoleLogger) Debug(format string, args ...interface{}) {
-	logger.debug.Printf("DEBUG: "+format, args...)
+func (logger *Logger) Debug(format string, args ...interface{}) {
+	logger.logChan <- func() {
+		logger.debug.Printf("DEBUG: "+format, args...)
+	}
 }
 
-func (logger *consoleLogger) Info(format string, args ...interface{}) {
-	logger.info.Printf("INFO:  "+format, args...)
+func (logger *Logger) Info(format string, args ...interface{}) {
+	logger.logChan <- func() {
+		logger.info.Printf("INFO:  "+format, args...)
+	}
 }
 
-func (logger *consoleLogger) Warning(format string, args ...interface{}) {
-	logger.warning.Printf("WARN:  "+format, args...)
+func (logger *Logger) Warning(format string, args ...interface{}) {
+	logger.logChan <- func() {
+		logger.warning.Printf("WARN:  "+format, args...)
+	}
 }
 
-func (logger *consoleLogger) Error(format string, args ...interface{}) {
-	logger.error.Printf("ERROR: "+format, args...)
+func (logger *Logger) Error(format string, args ...interface{}) {
+	logger.logChan <- func() {
+		logger.error.Printf("ERROR: "+format, args...)
+	}
 }
 
-func (logger *consoleLogger) Fatal(format string, args ...interface{}) {
-	logger.fatal.Printf("FATAL: "+format, args...)
+func (logger *Logger) Fatal(format string, args ...interface{}) {
+	logger.logChan <- func() {
+		logger.fatal.Printf("FATAL: "+format, args...)
+	}
 }

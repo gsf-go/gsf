@@ -1,7 +1,7 @@
 package service
 
 import (
-	"gsf/peer"
+	"github.com/gsf/gsf/src/gsf/peer"
 )
 
 type IService interface {

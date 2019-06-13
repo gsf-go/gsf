@@ -1,7 +1,7 @@
 package rpc
 
 import (
-	"gsf/peer"
+	"github.com/gsf/gsf/src/gsf/peer"
 	"reflect"
 	"strconv"
 	"testing"
