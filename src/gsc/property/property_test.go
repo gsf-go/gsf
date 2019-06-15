@@ -1,7 +1,7 @@
 package property
 
 import (
-	"gsc/serialization"
+	"github.com/gsf/gsf/src/gsc/serialization"
 	"testing"
 )
 
