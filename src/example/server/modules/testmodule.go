@@ -1,6 +1,7 @@
 package modules
 
 import (
+	"github.com/gsf/gsf/src/example/server/components"
 	"github.com/gsf/gsf/src/example/server/controllers"
 	"github.com/gsf/gsf/src/example/server/models"
 	"github.com/gsf/gsf/src/gsc/logger"
@@ -38,4 +39,5 @@ func (testModule *TestServerModule) InitializeFinish(service service.IService) {
 
 func (testModule *TestServerModule) Connected(peer peer.IPeer) {
 	logger.Log.Debug("Connected")
+	peer.AddComponent("User", components.NewUserComponent())
 }

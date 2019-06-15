@@ -161,11 +161,12 @@ func (tcpClient *TcpClient) handleData(
 	buffer []byte) uint16 {
 
 	packet := &network.Packet{
-		Config: config,
-		Buffer: buffer,
+		Config:     config,
+		Buffer:     buffer,
+		Connection: connection,
 	}
 
-	return tcpClient.handle.ReadHandle(packet, connection, tcpClient.post)
+	return tcpClient.handle.ReadHandle(packet, tcpClient.post)
 }
 
 func (tcpClient *TcpClient) post(connection network.IConnection, data []byte) {

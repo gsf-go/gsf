@@ -25,8 +25,8 @@ func (peer *Peer) SetConnection(connection network.IConnection) {
 	peer.connection = connection
 }
 
-func (peer *Peer) AddComponent(componentName string, component component.IComponent) {
-	peer.components.Store(componentName, component)
+func (peer *Peer) AddComponent(component component.IComponent) {
+	peer.components.Store(component.GetName(), component)
 }
 
 func (peer *Peer) GetComponent(componentName string) component.IComponent {

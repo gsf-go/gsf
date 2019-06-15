@@ -133,11 +133,12 @@ func (udpServer *udpServer) handleData(
 	buffer []byte) uint16 {
 
 	packet := &network.Packet{
-		Config: config,
-		Buffer: buffer,
+		Config:     config,
+		Buffer:     buffer,
+		Connection: connection,
 	}
 
-	return udpServer.handle.ReadHandle(packet, connection, udpServer.post)
+	return udpServer.handle.ReadHandle(packet, udpServer.post)
 }
 
 func (udpServer *udpServer) post(connection network.IConnection, data []byte) {

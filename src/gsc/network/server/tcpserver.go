@@ -147,13 +147,13 @@ func (tcpServer *TcpServer) handleData(
 	buffer []byte) uint16 {
 
 	packet := &network.Packet{
-		Config: config,
-		Buffer: buffer,
+		Config:     config,
+		Buffer:     buffer,
+		Connection: connection,
 	}
 
 	return tcpServer.handle.ReadHandle(
 		packet,
-		connection,
 		tcpServer.post)
 }
 

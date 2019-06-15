@@ -166,11 +166,12 @@ func (udpClient *udpClient) handleData(
 	buffer []byte) uint16 {
 
 	packet := &network.Packet{
-		Config: config,
-		Buffer: buffer,
+		Config:     config,
+		Buffer:     buffer,
+		Connection: connection,
 	}
 
-	return udpClient.handle.ReadHandle(packet, connection, udpClient.post)
+	return udpClient.handle.ReadHandle(packet, udpClient.post)
 }
 
 func (udpClient *udpClient) post(connection network.IConnection, data []byte) {

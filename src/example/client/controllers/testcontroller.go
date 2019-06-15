@@ -9,7 +9,9 @@ type TestController struct {
 }
 
 func NewTestController() *TestController {
-	return &TestController{}
+	return &TestController{
+		Controller: controller.NewController(),
+	}
 }
 
 func (testController *TestController) Initialize() {

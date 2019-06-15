@@ -20,7 +20,8 @@ func (application *Application) RegisterModule(moduleManager *module.ModuleManag
 }
 
 func (application *Application) SetLogConfig(config *logger.LogConfig) {
-
+	config.Capacity = 100
+	config.LogType = logger.Console
 }
 
 func (application *Application) SetNetConfig(config *network.NetConfig) {

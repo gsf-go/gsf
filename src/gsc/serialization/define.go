@@ -1,6 +1,8 @@
 package serialization
 
-import "reflect"
+import (
+	"reflect"
+)
 
 var GenerateVar = make(map[reflect.Kind]func(interface{}) interface{})
 var KindType = make(map[reflect.Kind]reflect.Type)

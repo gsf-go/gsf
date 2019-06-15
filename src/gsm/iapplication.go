@@ -44,6 +44,7 @@ func RunClient(application IApplication, args []string) {
 	logConfig := logger.NewLogConfig()
 
 	application.SetLogConfig(logConfig)
+	logger.Log.SetConfig(logConfig)
 	application.SetNetConfig(netConfig)
 	application.SetCryptoConfig(crypto.NewCryptoConfig())
 	application.RegisterModule(moduleManager)

@@ -1,4 +1,8 @@
 package component
 
-type Component struct {
+type DefaultComponent struct {
+}
+
+func (defaultComponent *DefaultComponent) GetName() string {
+	return "Default"
 }
