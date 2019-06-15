@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"github.com/gsf/gsf/src/gsm/controller"
+	"github.com/sf-go/gsf/src/gsm/controller"
 )
 
 type TestController struct {

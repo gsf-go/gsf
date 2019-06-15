@@ -1,11 +1,11 @@
 package controllers
 
 import (
-	"github.com/gsf/gsf/src/example/server/components"
-	"github.com/gsf/gsf/src/example/server/models"
-	"github.com/gsf/gsf/src/gsc/logger"
-	"github.com/gsf/gsf/src/gsf/peer"
-	"github.com/gsf/gsf/src/gsm/controller"
+	"github.com/sf-go/gsf/src/example/server/components"
+	"github.com/sf-go/gsf/src/example/server/models"
+	"github.com/sf-go/gsf/src/gsc/logger"
+	"github.com/sf-go/gsf/src/gsf/peer"
+	"github.com/sf-go/gsf/src/gsm/controller"
 )
 
 type TestController struct {

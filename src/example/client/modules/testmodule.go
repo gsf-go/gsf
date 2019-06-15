@@ -1,14 +1,14 @@
 package modules
 
 import (
-	"github.com/gsf/gsf/src/example/client/components"
-	"github.com/gsf/gsf/src/example/client/controllers"
-	"github.com/gsf/gsf/src/example/client/models"
-	"github.com/gsf/gsf/src/gsc/logger"
-	"github.com/gsf/gsf/src/gsc/serialization"
-	"github.com/gsf/gsf/src/gsf/peer"
-	"github.com/gsf/gsf/src/gsf/service"
-	"github.com/gsf/gsf/src/gsm/module"
+	"github.com/sf-go/gsf/src/example/client/components"
+	"github.com/sf-go/gsf/src/example/client/controllers"
+	"github.com/sf-go/gsf/src/example/client/models"
+	"github.com/sf-go/gsf/src/gsc/logger"
+	"github.com/sf-go/gsf/src/gsc/serialization"
+	"github.com/sf-go/gsf/src/gsf/peer"
+	"github.com/sf-go/gsf/src/gsf/service"
+	"github.com/sf-go/gsf/src/gsm/module"
 	"strconv"
 )
 

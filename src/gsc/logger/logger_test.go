@@ -8,4 +8,6 @@ func TestLog(t *testing.T) {
 	Log.Warning("%s", "warning")
 	Log.Error("%s", "error")
 	Log.Fatal("%s", "critical")
+
+	close(Log.logChan)
 }

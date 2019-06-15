@@ -1,6 +1,6 @@
 package models
 
-import "github.com/gsf/gsf/src/gsc/serialization"
+import "github.com/sf-go/gsf/src/gsc/serialization"
 
 type TestModel struct {
 	Name string

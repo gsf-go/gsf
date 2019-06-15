@@ -1,7 +1,7 @@
 package rpc
 
 import (
-	"github.com/gsf/gsf/src/gsc/serialization"
+	"github.com/sf-go/gsf/src/gsc/serialization"
 	"reflect"
 )
 

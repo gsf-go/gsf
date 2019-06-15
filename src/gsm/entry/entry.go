@@ -1,6 +1,6 @@
 package entry
 
-import "github.com/gsf/gsf/src/gsm/module"
+import "github.com/sf-go/gsf/src/gsm/module"
 
 type Entry struct {
 }

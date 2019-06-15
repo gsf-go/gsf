@@ -1,8 +1,8 @@
 package peer
 
 import (
-	"github.com/gsf/gsf/src/gsc/network"
-	"github.com/gsf/gsf/src/gsm/component"
+	"github.com/sf-go/gsf/src/gsc/network"
+	"github.com/sf-go/gsf/src/gsm/component"
 )
 
 type IPeer interface {

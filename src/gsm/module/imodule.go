@@ -1,8 +1,8 @@
 package module
 
 import (
-	"github.com/gsf/gsf/src/gsf/peer"
-	"github.com/gsf/gsf/src/gsf/service"
+	"github.com/sf-go/gsf/src/gsf/peer"
+	"github.com/sf-go/gsf/src/gsf/service"
 )
 
 type IModule interface {

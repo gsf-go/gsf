@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"github.com/gsf/gsf/src/gsf/peer"
+	"github.com/sf-go/gsf/src/gsf/peer"
 )
 
 type IController interface {

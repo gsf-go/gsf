@@ -1,7 +1,7 @@
 package components
 
 import (
-	"github.com/gsf/gsf/src/gsc/property"
+	"github.com/sf-go/gsf/src/gsc/property"
 	"reflect"
 )
 

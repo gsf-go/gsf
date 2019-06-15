@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/gsf/gsf/src/gsm"
+	"github.com/sf-go/gsf/src/gsm"
 	"os"
 	"time"
 )

@@ -1,12 +1,12 @@
 package gsm
 
 import (
-	"github.com/gsf/gsf/src/gsc/crypto"
-	"github.com/gsf/gsf/src/gsc/logger"
-	"github.com/gsf/gsf/src/gsc/network"
-	"github.com/gsf/gsf/src/gsf/peer"
-	"github.com/gsf/gsf/src/gsf/service"
-	"github.com/gsf/gsf/src/gsm/module"
+	"github.com/sf-go/gsf/src/gsc/crypto"
+	"github.com/sf-go/gsf/src/gsc/logger"
+	"github.com/sf-go/gsf/src/gsc/network"
+	"github.com/sf-go/gsf/src/gsf/peer"
+	"github.com/sf-go/gsf/src/gsf/service"
+	"github.com/sf-go/gsf/src/gsm/module"
 	"testing"
 	"time"
 )

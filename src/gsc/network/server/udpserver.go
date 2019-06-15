@@ -2,9 +2,9 @@ package server
 
 import (
 	"context"
-	"github.com/gsf/gsf/src/gsc/logger"
-	"github.com/gsf/gsf/src/gsc/network"
-	"github.com/gsf/gsf/src/gsc/pool"
+	"github.com/sf-go/gsf/src/gsc/logger"
+	"github.com/sf-go/gsf/src/gsc/network"
+	"github.com/sf-go/gsf/src/gsc/pool"
 	"net"
 	"strconv"
 	"time"

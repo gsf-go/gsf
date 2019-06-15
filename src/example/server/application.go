@@ -1,11 +1,11 @@
 package main
 
 import (
-	"github.com/gsf/gsf/src/example/server/modules"
-	"github.com/gsf/gsf/src/gsc/crypto"
-	"github.com/gsf/gsf/src/gsc/logger"
-	"github.com/gsf/gsf/src/gsc/network"
-	"github.com/gsf/gsf/src/gsm/module"
+	"github.com/sf-go/gsf/src/example/server/modules"
+	"github.com/sf-go/gsf/src/gsc/crypto"
+	"github.com/sf-go/gsf/src/gsc/logger"
+	"github.com/sf-go/gsf/src/gsc/network"
+	"github.com/sf-go/gsf/src/gsm/module"
 )
 
 type Application struct {

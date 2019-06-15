@@ -1,7 +1,7 @@
 package property
 
 import (
-	"github.com/gsf/gsf/src/gsc/serialization"
+	"github.com/sf-go/gsf/src/gsc/serialization"
 	"testing"
 )
 
@@ -21,7 +21,7 @@ func newUser() *user {
 
 func TestValueType(t *testing.T) {
 	user := newUser()
-	user.Register(&user)
+	user.Register(user)
 
 	user.SetValue("Name", "sss")
 	t.Log(user.GetValue("Name"))
@@ -35,7 +35,7 @@ func TestValueType(t *testing.T) {
 
 func TestSerialization(t *testing.T) {
 	user := newUser()
-	user.Register(&user)
+	user.Register(user)
 
 	user.Name = "xxx"
 	user.Dot = 3.1415
@@ -53,7 +53,7 @@ func TestSerialization(t *testing.T) {
 	user.Name = ""
 	user.Age = 0
 
-	reader := serialization.NewEndianBinaryReader(bytes)
+	reader := serialization.NewEndianBinaryReader(bytes, nil)
 	user.FromBinaryReader(reader)
 
 	t.Log(user.Name)
