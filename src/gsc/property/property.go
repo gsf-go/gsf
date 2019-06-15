@@ -28,8 +28,8 @@ func NewProperty() *Property {
 
 func (property *Property) Register(obj interface{}) {
 
-	tv := reflect.ValueOf(obj).Elem().Elem()
-	tk := reflect.TypeOf(obj).Elem().Elem()
+	tv := reflect.ValueOf(obj).Elem()
+	tk := reflect.TypeOf(obj).Elem()
 
 	for i := 0; i < tv.NumField(); i++ {
 		field := tv.Field(i)

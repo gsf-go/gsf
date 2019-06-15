@@ -45,7 +45,7 @@ func TestServerSocket(t *testing.T) {
 
 	clientSocket.OnMessage = func(peer peer.IPeer, data []byte) {
 		response := rpc.NewRpcResponse()
-		response.Response(peer, data)
+		response.Response(data, peer)
 	}
 	clientSocket.Connect(config)
 	time.Sleep(time.Second * 5)

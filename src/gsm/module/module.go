@@ -22,7 +22,7 @@ func (module *Module) AddController(controller controller.IController) {
 	controller.Initialize()
 }
 
-func (module *Module) AddModel(name string, generate func() serialization.ISerializablePacket) {
+func (module *Module) AddModel(name string, generate func(args ...interface{}) serialization.ISerializablePacket) {
 	serialization.GetPacketManagerInstance().AddPacket(name, generate)
 }
 

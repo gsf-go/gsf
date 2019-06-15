@@ -3,6 +3,7 @@ package controller
 import (
 	"github.com/gsf/gsf/src/gsc/rpc"
 	"github.com/gsf/gsf/src/gsf/peer"
+	"github.com/gsf/gsf/src/gsm/component"
 	"reflect"
 )
 
@@ -31,7 +32,8 @@ func (controller *Controller) Register(
 	method := reflect.ValueOf(handle())
 	peerType := reflect.TypeOf((*peer.IPeer)(nil)).Elem()
 	index := -1
-	for i := 0; i < method.Type().NumIn(); i++ {
+	argsLength := method.Type().NumIn()
+	for i := 0; i < argsLength; i++ {
 		fieldType := method.Type().In(i)
 		if fieldType.Implements(peerType) {
 			index = i
@@ -52,24 +54,27 @@ func (controller *Controller) Register(
 
 	rpcRegister.Add(name,
 		func(p peer.IPeer, values []reflect.Value) []reflect.Value {
+
 			if index > 0 {
 				values = append(values, make([]reflect.Value, 1)...)
 				values = append(values[:index], values[index:]...)
 				values[index] = reflect.ValueOf(p)
 			}
 
+			args := values[:argsLength]
+
 			if beforeValue != reflect.ValueOf(nil) {
-				beforeRet := beforeValue.Call(values)
+				beforeRet := beforeValue.Call(args)
 				if beforeRet[0].Bool() {
-					ret := method.Call(values)
+					ret := method.Call(args)
 					if afterValue != reflect.ValueOf(nil) {
-						afterValue.Call(values)
+						afterValue.Call(args)
 					}
 					return ret
 				}
 				return nil
 			}
-			ret := method.Call(values)
+			ret := method.Call(args)
 			return ret
 		})
 }
@@ -107,7 +112,14 @@ func (controller *Controller) Invoke(
 	if controller.PreInvoke != nil && !controller.PreInvoke() {
 		return nil
 	}
-	bytes := rpcInvoke.Request(name, args()...)
+
+	components := make([]interface{}, 0)
+	p.Range(func(key string, component component.IComponent) bool {
+		components = append(components, component)
+		return true
+	})
+
+	bytes := rpcInvoke.Request(name, append(args(), components...)...)
 	connection := p.GetConnection()
 	if connection != nil {
 		connection.Send(bytes)
@@ -161,7 +173,13 @@ func (controller *Controller) AsyncInvoke(
 		return
 	}
 
-	bytes := rpcInvoke.Request(name, args()...)
+	components := make([]interface{}, 0)
+	p.Range(func(key string, component component.IComponent) bool {
+		components = append(components, component)
+		return true
+	})
+
+	bytes := rpcInvoke.Request(name, append(args(), components...)...)
 	connection := p.GetConnection()
 	if connection != nil {
 		connection.Send(bytes)

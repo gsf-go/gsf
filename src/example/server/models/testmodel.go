@@ -7,6 +7,10 @@ type TestModel struct {
 	Age  int
 }
 
+func NewTestModel() *TestModel {
+	return &TestModel{}
+}
+
 func (testModel *TestModel) ToBinaryWriter(writer serialization.IEndianBinaryWriter) {
 	writer.Write(testModel.Name, testModel.Age)
 }

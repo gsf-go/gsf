@@ -4,7 +4,7 @@ import (
 	"reflect"
 )
 
-var GenerateVar = make(map[reflect.Kind]func(interface{}) interface{})
+var GenerateVar = make(map[reflect.Kind]func(...interface{}) interface{})
 var KindType = make(map[reflect.Kind]reflect.Type)
 var KindPtrType = make(map[reflect.Kind]reflect.Type)
 
@@ -15,86 +15,86 @@ func init() {
 }
 
 func initVar() {
-	GenerateVar[reflect.Invalid] = func(param interface{}) interface{} {
+	GenerateVar[reflect.Invalid] = func(param ...interface{}) interface{} {
 		var invalid interface{}
 		return &invalid
 	}
 
-	GenerateVar[reflect.Bool] = func(param interface{}) interface{} {
+	GenerateVar[reflect.Bool] = func(param ...interface{}) interface{} {
 		b := new(bool)
 		return b
 	}
 
-	GenerateVar[reflect.Int] = func(param interface{}) interface{} {
+	GenerateVar[reflect.Int] = func(param ...interface{}) interface{} {
 		i := new(int)
 		return i
 	}
 
-	GenerateVar[reflect.Int8] = func(param interface{}) interface{} {
+	GenerateVar[reflect.Int8] = func(param ...interface{}) interface{} {
 		i := new(int8)
 		return i
 	}
 
-	GenerateVar[reflect.Int16] = func(param interface{}) interface{} {
+	GenerateVar[reflect.Int16] = func(param ...interface{}) interface{} {
 		i := new(int16)
 		return i
 	}
 
-	GenerateVar[reflect.Int32] = func(param interface{}) interface{} {
+	GenerateVar[reflect.Int32] = func(param ...interface{}) interface{} {
 		i := new(int32)
 		return i
 	}
 
-	GenerateVar[reflect.Int64] = func(param interface{}) interface{} {
+	GenerateVar[reflect.Int64] = func(param ...interface{}) interface{} {
 		i := new(int64)
 		return i
 	}
 
-	GenerateVar[reflect.Uint] = func(param interface{}) interface{} {
+	GenerateVar[reflect.Uint] = func(param ...interface{}) interface{} {
 		i := new(uint)
 		return i
 	}
 
-	GenerateVar[reflect.Uint8] = func(param interface{}) interface{} {
+	GenerateVar[reflect.Uint8] = func(param ...interface{}) interface{} {
 		i := new(uint8)
 		return i
 	}
 
-	GenerateVar[reflect.Uint16] = func(param interface{}) interface{} {
+	GenerateVar[reflect.Uint16] = func(param ...interface{}) interface{} {
 		i := new(uint16)
 		return i
 	}
 
-	GenerateVar[reflect.Uint32] = func(param interface{}) interface{} {
+	GenerateVar[reflect.Uint32] = func(param ...interface{}) interface{} {
 		i := new(uint32)
 		return i
 	}
 
-	GenerateVar[reflect.Uint64] = func(param interface{}) interface{} {
+	GenerateVar[reflect.Uint64] = func(param ...interface{}) interface{} {
 		i := new(uint64)
 		return i
 	}
 
-	GenerateVar[reflect.Float32] = func(param interface{}) interface{} {
+	GenerateVar[reflect.Float32] = func(param ...interface{}) interface{} {
 		i := new(float32)
 		return i
 	}
 
-	GenerateVar[reflect.Float64] = func(param interface{}) interface{} {
+	GenerateVar[reflect.Float64] = func(param ...interface{}) interface{} {
 		i := new(float64)
 		return i
 	}
 
-	GenerateVar[reflect.String] = func(param interface{}) interface{} {
+	GenerateVar[reflect.String] = func(param ...interface{}) interface{} {
 		i := new(string)
 		return i
 	}
 
-	GenerateVar[reflect.Struct] = func(param interface{}) interface{} {
-		name := param.(string)
+	GenerateVar[reflect.Struct] = func(param ...interface{}) interface{} {
+		name := param[0].(string)
 		packet := GetPacketManagerInstance().GetPacket(name)
 		if packet != nil {
-			return packet()
+			return packet(param...)
 		}
 		return nil
 	}

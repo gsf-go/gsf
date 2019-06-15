@@ -11,6 +11,12 @@ type Peer struct {
 	components *sync.Map
 }
 
+func (peer *Peer) Range(foreach func(key string, component component.IComponent) bool) {
+	peer.components.Range(func(key, value interface{}) bool {
+		return foreach(key.(string), value.(component.IComponent))
+	})
+}
+
 func NewPeer() *Peer {
 	return &Peer{
 		components: new(sync.Map),

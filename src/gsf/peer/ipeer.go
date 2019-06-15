@@ -9,8 +9,10 @@ type IPeer interface {
 	GetConnection() network.IConnection
 	SetConnection(connection network.IConnection)
 
-	AddComponent(componentName string, component component.IComponent)
+	AddComponent(component component.IComponent)
 	GetComponent(componentName string) component.IComponent
 	RemoveComponent(componentName string)
 	HasComponent(componentName string) bool
+
+	Range(func(key string, component component.IComponent) bool)
 }

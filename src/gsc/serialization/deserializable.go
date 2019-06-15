@@ -6,7 +6,7 @@ import (
 )
 
 type IDeserializable interface {
-	Deserialize(bytes []byte) []reflect.Value
+	Deserialize(bytes []byte, args ...interface{}) []reflect.Value
 }
 
 type Deserializable struct {
@@ -16,7 +16,7 @@ func NewDeserializable() *Deserializable {
 	return &Deserializable{}
 }
 
-func (deserializable *Deserializable) Deserialize(bytes []byte) []reflect.Value {
+func (deserializable *Deserializable) Deserialize(bytes []byte, args ...interface{}) []reflect.Value {
 
 	byteReader := bytestream.NewByteReader2(bytes)
 	objects := make([]reflect.Value, 0)
@@ -27,14 +27,14 @@ func (deserializable *Deserializable) Deserialize(bytes []byte) []reflect.Value 
 	length := deserializeValue(&kind, byteReader).Interface().(uint8)
 
 	for i := uint8(0); i < length; i++ {
-		value := DeserializeSingle(byteReader)
+		value := DeserializeSingle(byteReader, args...)
 		objects = append(objects, value)
 	}
 
 	return objects
 }
 
-func DeserializeSingle(byteReader *bytestream.ByteReader) reflect.Value {
+func DeserializeSingle(byteReader *bytestream.ByteReader, args ...interface{}) reflect.Value {
 
 	typeValue := uint8(0)
 	byteReader.Read(&typeValue)
@@ -60,7 +60,7 @@ func DeserializeSingle(byteReader *bytestream.ByteReader) reflect.Value {
 		return data
 	}
 
-	if data := deserializeStruct(&kind, byteReader); data != reflect.ValueOf(nil) {
+	if data := deserializeStruct(&kind, byteReader, args...); data != reflect.ValueOf(nil) {
 		return data
 	}
 	return reflect.ValueOf(nil)
@@ -229,7 +229,7 @@ func deserializeMap(kind *reflect.Kind, byteReader *bytestream.ByteReader) refle
 	return maps
 }
 
-func deserializeStruct(kind *reflect.Kind, byteReader *bytestream.ByteReader) reflect.Value {
+func deserializeStruct(kind *reflect.Kind, byteReader *bytestream.ByteReader, args ...interface{}) reflect.Value {
 	if *kind != reflect.Struct {
 		return reflect.ValueOf(nil)
 	}
@@ -241,13 +241,20 @@ func deserializeStruct(kind *reflect.Kind, byteReader *bytestream.ByteReader) re
 	if !ok {
 		return reflect.ValueOf(nil)
 	}
-	value := valueGenerate(name)
+
+	value := valueGenerate(append(append(make([]interface{}, 0), name), args...)...)
 	packet := value.(ISerializablePacket)
 
 	data := []byte(nil)
 	byteReader.Read(&data)
 
-	reader := NewEndianBinaryReader(data)
+	tmp := interface{}(nil)
+	if len(args) == 0 {
+		tmp = nil
+	} else {
+		tmp = args[0]
+	}
+	reader := NewEndianBinaryReader(data, tmp)
 	packet.FromBinaryReader(reader)
 
 	return reflect.ValueOf(packet)

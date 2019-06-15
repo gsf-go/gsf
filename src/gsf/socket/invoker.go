@@ -1,6 +1,7 @@
 package socket
 
 import (
+	"github.com/gsf/gsf/src/gsc/logger"
 	"github.com/gsf/gsf/src/gsc/rpc"
 	"github.com/gsf/gsf/src/gsf/peer"
 	"strings"
@@ -27,11 +28,28 @@ func NewInvoker() *invoker {
 }
 
 func (invoker *invoker) Invoke(peer peer.IPeer, data []byte) {
-	response := rpc.NewRpcResponse()
-	messageId, ret := response.Response(peer, data)
+	defer func() {
+		if r := recover(); r != nil {
+			logger.Log.Error("Recovered in %s", r)
+		}
+	}()
 
-	values := make([]interface{}, len(ret))
-	for i, item := range ret {
+	response := rpc.NewRpcResponse()
+	result := response.Response(data, peer)
+
+	if len(result) == 0 {
+		return
+	}
+	messageId := result[0].String()
+	method := rpc.GetRpcRegisterInstance().GetRpcByName(messageId)
+	if method == nil {
+		logger.Log.Error("没有注册ID:" + messageId + "的RPC")
+		return
+	}
+
+	value := method(peer, result[1:])
+	values := make([]interface{}, len(value))
+	for i, item := range value {
 		values[i] = item.Interface()
 	}
 

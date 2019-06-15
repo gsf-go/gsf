@@ -1,14 +1,12 @@
 package rpc
 
 import (
-	"github.com/gsf/gsf/src/gsc/logger"
 	"github.com/gsf/gsf/src/gsc/serialization"
-	"github.com/gsf/gsf/src/gsf/peer"
 	"reflect"
 )
 
 type IRpcResponse interface {
-	Response(peer peer.IPeer, data []byte) (string, []reflect.Value)
+	Response(data []byte) []reflect.Value
 }
 
 type RpcResponse struct {
@@ -21,13 +19,7 @@ func NewRpcResponse() *RpcResponse {
 	}
 }
 
-func (rpcResponse *RpcResponse) Response(peer peer.IPeer, data []byte) (string, []reflect.Value) {
-	result := rpcResponse.deserializable.Deserialize(data)
-	messageId := result[0].String()
-	method := GetRpcRegisterInstance().GetRpcByName(messageId)
-	if method == nil {
-		logger.Log.Error("没有注册ID:" + messageId + "的RPC")
-		return messageId, nil
-	}
-	return messageId, method(peer, result[1:])
+func (rpcResponse *RpcResponse) Response(data []byte, args ...interface{}) []reflect.Value {
+	result := rpcResponse.deserializable.Deserialize(data, args...)
+	return result
 }

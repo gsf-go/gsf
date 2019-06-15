@@ -21,8 +21,8 @@ func (logger *Logger) SetConfig(config *LogConfig) {
 	go func() {
 		for {
 			select {
-			case l := <-logger.logChan:
-				if l != nil {
+			case l, ok := <-logger.logChan:
+				if l != nil && ok {
 					l()
 				}
 			}

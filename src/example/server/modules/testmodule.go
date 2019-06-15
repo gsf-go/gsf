@@ -25,9 +25,16 @@ func (testModule *TestServerModule) Initialize(service service.IService) {
 	testModule.Module.Initialize(service)
 
 	testModule.AddController(controllers.NewTestController())
-	testModule.AddModel("TestModel", func() serialization.ISerializablePacket {
-		return new(models.TestModel)
+	testModule.AddModel("TestModel", func(args ...interface{}) serialization.ISerializablePacket {
+		return models.NewTestModel()
 	})
+
+	testModule.AddModel("UserComponent", func(args ...interface{}) serialization.ISerializablePacket {
+		name := args[0].(string)
+		p := args[1].(peer.IPeer)
+		return p.GetComponent(name).(serialization.ISerializablePacket)
+	})
+
 	logger.Log.Debug("Initialize")
 }
 
@@ -39,5 +46,5 @@ func (testModule *TestServerModule) InitializeFinish(service service.IService) {
 
 func (testModule *TestServerModule) Connected(peer peer.IPeer) {
 	logger.Log.Debug("Connected")
-	peer.AddComponent("User", components.NewUserComponent())
+	peer.AddComponent(components.NewUserComponent())
 }

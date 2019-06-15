@@ -99,8 +99,8 @@ func (serializablePacket *SerializablePacket) FromBinaryReader(reader IEndianBin
 }
 
 func TestStructType(t *testing.T) {
-	GetPacketManagerInstance().AddPacket("SerializablePacket", func() ISerializablePacket {
-		return new(SerializablePacket)
+	GetPacketManagerInstance().AddPacket("SerializablePacket", func(args ...interface{}) ISerializablePacket {
+		return NewSerializablePacket("", 0)
 	})
 	sut := NewSerializablePacket("Test", 100)
 	values := Show(t, sut)
@@ -109,14 +109,14 @@ func TestStructType(t *testing.T) {
 }
 
 func TestStructType2(t *testing.T) {
-	GetPacketManagerInstance().AddPacket("SerializablePacket", func() ISerializablePacket {
-		return new(SerializablePacket)
+	GetPacketManagerInstance().AddPacket("SerializablePacket", func(args ...interface{}) ISerializablePacket {
+		return NewSerializablePacket("", 0)
 	})
 	sut := NewSerializablePacket("Test", 100)
 	writer := NewEndianBinaryWriter()
 	sut.ToBinaryWriter(writer)
 	bytes := writer.ToBytes()
-	reader := NewEndianBinaryReader(bytes)
+	reader := NewEndianBinaryReader(bytes, nil)
 	sut2 := NewSerializablePacket("", 0)
 	sut2.FromBinaryReader(reader)
 }

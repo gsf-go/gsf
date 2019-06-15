@@ -1,6 +1,7 @@
 package modules
 
 import (
+	"github.com/gsf/gsf/src/example/client/components"
 	"github.com/gsf/gsf/src/example/client/controllers"
 	"github.com/gsf/gsf/src/example/client/models"
 	"github.com/gsf/gsf/src/gsc/logger"
@@ -25,7 +26,7 @@ func (testModule *TestClientModule) Initialize(service service.IService) {
 	testModule.Module.Initialize(service)
 
 	testModule.AddController(controllers.NewTestController())
-	testModule.AddModel("TestModel", func() serialization.ISerializablePacket {
+	testModule.AddModel("TestModel", func(args ...interface{}) serialization.ISerializablePacket {
 		return new(models.TestModel)
 	})
 	logger.Log.Debug("Initialize")
@@ -33,6 +34,12 @@ func (testModule *TestClientModule) Initialize(service service.IService) {
 
 func (testModule *TestClientModule) Connected(peer peer.IPeer) {
 	controller := controllers.NewTestController()
+
+	component := components.NewUserComponent()
+	component.SetValue("Account", "account")
+	component.SetValue("Password", "123456")
+	peer.AddComponent(component)
+
 	result := controller.Invoke("Test", peer, func() []interface{} {
 		return []interface{}{
 			10000,

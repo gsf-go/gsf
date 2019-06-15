@@ -12,12 +12,14 @@ type IEndianBinaryReader interface {
 type EndianBinaryReader struct {
 	deserializable IDeserializable
 	buffer         []byte
+	extension      interface{}
 }
 
-func NewEndianBinaryReader(buffer []byte) *EndianBinaryReader {
+func NewEndianBinaryReader(buffer []byte, extension interface{}) *EndianBinaryReader {
 	return &EndianBinaryReader{
 		deserializable: NewDeserializable(),
 		buffer:         buffer,
+		extension:      extension,
 	}
 }
 
@@ -29,7 +31,7 @@ func (reader *EndianBinaryReader) Read(args ...interface{}) {
 }
 
 func (reader *EndianBinaryReader) ReadValues() []interface{} {
-	values := reader.deserializable.Deserialize(reader.buffer)
+	values := reader.deserializable.Deserialize(reader.buffer, reader.extension)
 	result := make([]interface{}, 0)
 	for _, item := range values {
 		result = append(result, item.Interface())

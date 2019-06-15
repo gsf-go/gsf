@@ -1,6 +1,8 @@
 package serialization
 
-import "sync"
+import (
+	"sync"
+)
 
 //go:generate ../../../gen/Singleton.exe -struct=PacketManager -out=./packetmanager.go
 
@@ -24,14 +26,14 @@ func NewPacketManager() *PacketManager {
 	}
 }
 
-func (packetManager *PacketManager) AddPacket(name string, generate func() ISerializablePacket) {
+func (packetManager *PacketManager) AddPacket(name string, generate func(args ...interface{}) ISerializablePacket) {
 	packetManager.packets.Store(name, generate)
 }
 
-func (packetManager *PacketManager) GetPacket(name string) func() ISerializablePacket {
+func (packetManager *PacketManager) GetPacket(name string) func(args ...interface{}) ISerializablePacket {
 	v, ok := packetManager.packets.Load(name)
 	if ok {
-		return v.(func() ISerializablePacket)
+		return v.(func(...interface{}) ISerializablePacket)
 	}
 	return nil
 }

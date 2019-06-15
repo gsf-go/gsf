@@ -112,7 +112,7 @@ func (tcpClient *TcpClient) read(
 			n, err := conn.Read(buffer)
 			if err != nil {
 				errChan <- func() (network.IConnection, error, string) {
-					return connection, err, ""
+					return connection, err, "Error"
 				}
 				return
 			}
@@ -128,7 +128,7 @@ func (tcpClient *TcpClient) read(
 			err = conn.SetWriteDeadline(deadline)
 			if err != nil {
 				errChan <- func() (network.IConnection, error, string) {
-					return connection, err, ""
+					return connection, err, "Error"
 				}
 				return
 			}
