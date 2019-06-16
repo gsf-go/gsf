@@ -5,20 +5,7 @@ import (
 	"github.com/sf-go/gsf/src/gsc/rpc"
 	"github.com/sf-go/gsf/src/gsf/peer"
 	"strings"
-	"sync"
 )
-
-//go:generate ../../gen/Singleton.exe -struct=invoker -out=./invoker.go
-
-var invokerInstance *invoker
-var invokerOnce sync.Once
-
-func GetInvokerInstance() *invoker {
-	invokerOnce.Do(func() {
-		invokerInstance = NewInvoker()
-	})
-	return invokerInstance
-}
 
 type invoker struct {
 }

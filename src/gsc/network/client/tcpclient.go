@@ -76,11 +76,7 @@ func (tcpClient *TcpClient) Connect(config *network.NetConfig) {
 		case callback := <-errDone:
 			connection, err, reason := callback()
 
-			if err != nil {
-				tcpClient.OnDisconnected(connection, reason)
-			} else {
-				tcpClient.OnDisconnected(connection, "Error")
-			}
+			tcpClient.OnDisconnected(connection, reason)
 
 			if tcpClient.OnError != nil {
 				tcpClient.OnError(connection, err)

@@ -86,11 +86,7 @@ func (udpClient *udpClient) Connect(config *network.NetConfig) {
 		case callback := <-errDone:
 			connection, err, reason := callback()
 
-			if err != nil {
-				udpClient.OnDisconnected(connection, reason)
-			} else {
-				udpClient.OnDisconnected(connection, "Error")
-			}
+			udpClient.OnDisconnected(connection, reason)
 
 			if udpClient.OnError != nil {
 				udpClient.OnError(connection, err)
@@ -118,7 +114,7 @@ func (udpClient *udpClient) read(
 			err := conn.SetReadDeadline(time.Now().Add(15 * time.Second))
 			if err != nil {
 				errChan <- func() (network.IConnection, error, string) {
-					return connection, err, ""
+					return connection, err, "Error"
 				}
 				return
 			}
@@ -126,7 +122,7 @@ func (udpClient *udpClient) read(
 			n, err := conn.Read(buffer)
 			if err != nil {
 				errChan <- func() (network.IConnection, error, string) {
-					return connection, err, ""
+					return connection, err, "Error"
 				}
 				return
 			}

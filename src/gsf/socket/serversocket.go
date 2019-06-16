@@ -38,7 +38,8 @@ func (serverSocket *ServerSocket) addListener(
 			return
 		}
 
-		GetInvokerInstance().Invoke(p, data)
+		invoker := NewInvoker()
+		invoker.Invoke(p, data)
 	}
 
 	server.OnError = func(connection network.IConnection, err error) {

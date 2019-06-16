@@ -60,13 +60,13 @@ func (serializable *Serializable) Serialize(args ...interface{}) []byte {
 
 func serializeValue(value interface{}) []byte {
 
-	king := reflect.ValueOf(value).Kind()
-	if _, ok := GenerateVar[king]; !ok {
+	kind := reflect.ValueOf(value).Kind()
+	if _, ok := GenerateVar[kind]; !ok {
 		return nil
 	}
 
 	byteWriter := bytestream.NewByteWriter3()
-	byteWriter.Write(uint8(king))
+	byteWriter.Write(uint8(kind))
 	byteWriter.Write(value)
 	return byteWriter.ToBytes()
 }
@@ -99,7 +99,14 @@ func serializeSlice(value interface{}) []byte {
 
 	if kind == reflect.Ptr {
 		byteWriter.Write(uint8(reflect.Ptr))
-		byteWriter.Write(uint8(varType.Elem().Elem().Kind()))
+		element := varType.Elem().Elem()
+		kind = element.Kind()
+		if kind == reflect.Struct {
+			byteWriter.Write(uint8(kind))
+			byteWriter.Write(element.Name())
+		} else {
+			byteWriter.Write(uint8(kind))
+		}
 	} else {
 		byteWriter.Write(uint8(varType.Elem().Kind()))
 	}
@@ -109,8 +116,14 @@ func serializeSlice(value interface{}) []byte {
 	byteWriter.Write(length)
 
 	for i := 0; i < int(length); i++ {
-		v := valueType.Index(i).Interface()
-		byteWriter.Write(v)
+		item := valueType.Index(i)
+		v := item.Interface()
+		kind := item.Kind()
+		if kind == reflect.Ptr && item.Elem().Kind() == reflect.Struct {
+			byteWriter.Write(serializeStruct(v))
+		} else {
+			byteWriter.Write(v)
+		}
 	}
 
 	return byteWriter.ToBytes()
@@ -118,23 +131,35 @@ func serializeSlice(value interface{}) []byte {
 
 func serializeMap(value interface{}) []byte {
 
-	varType := reflect.TypeOf(value)
-	if varType.Kind() != reflect.Map {
+	mapType := reflect.TypeOf(value)
+	if mapType.Kind() != reflect.Map {
 		return nil
 	}
 
 	byteWriter := bytestream.NewByteWriter3()
 	byteWriter.Write(uint8(reflect.Map))
 
-	keyKind := varType.Key().Kind()
-	byteWriter.Write(uint8(keyKind))
-	valueKind := varType.Elem().Kind()
-
+	valueKind := mapType.Elem().Kind()
+	kind := reflect.Invalid
 	if valueKind == reflect.Ptr {
-		byteWriter.Write(uint8(varType.Elem().Elem().Kind()))
+		byteWriter.Write(uint8(reflect.Ptr))
+		valueType := mapType.Elem().Elem()
+		kind = valueType.Kind()
+
+		byteWriter.Write(uint8(kind))
+		if kind == reflect.Struct {
+			byteWriter.Write(valueType.Name())
+		}
 	} else {
-		byteWriter.Write(uint8(varType.Elem().Kind()))
+		kind = mapType.Elem().Kind()
+		byteWriter.Write(uint8(kind))
+		if kind == reflect.Struct {
+			byteWriter.Write(mapType.Elem().Name())
+		}
 	}
+
+	keyKind := mapType.Key().Kind()
+	byteWriter.Write(uint8(keyKind))
 
 	valueType := reflect.ValueOf(value)
 	length := uint16(valueType.Len())
@@ -142,7 +167,11 @@ func serializeMap(value interface{}) []byte {
 
 	for _, key := range valueType.MapKeys() {
 		byteWriter.Write(key.Interface())
-		byteWriter.Write(valueType.MapIndex(key).Interface())
+		if kind == reflect.Struct {
+			byteWriter.Write(serializeStruct(valueType.MapIndex(key).Interface()))
+		} else {
+			byteWriter.Write(valueType.MapIndex(key).Interface())
+		}
 	}
 
 	return byteWriter.ToBytes()
@@ -166,7 +195,7 @@ func serializeStruct(value interface{}) []byte {
 	bytes := writer.ToBytes()
 
 	byteWriter.Write(uint8(reflect.Struct))
-	byteWriter.Write(reflect.TypeOf(value).Elem().Name())
+	byteWriter.Write(varType.Elem().Name())
 	byteWriter.Write(bytes)
 
 	return byteWriter.ToBytes()

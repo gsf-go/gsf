@@ -8,8 +8,9 @@ import (
 )
 
 type ClientService struct {
-	clientSocket socket.IClientSocket
-	event        *sync.Map
+	clientSocket    socket.IClientSocket
+	event           *sync.Map
+	messageCallback []func(peer peer.IPeer, data []byte) bool
 }
 
 func NewClientService(clientSocket socket.IClientSocket) *ClientService {
@@ -47,7 +48,16 @@ func (service *ClientService) RemoveEventListener(eventType string) {
 }
 
 func (service *ClientService) SetHandler(
-	opCode string,
-	callback func(peer peer.IPeer, data []byte)) {
-
+	callback func(peer peer.IPeer, data []byte) bool) {
+	service.messageCallback = append(service.messageCallback, callback)
+	serverSocket, ok := service.clientSocket.(*socket.ClientSocket)
+	if ok {
+		serverSocket.OnMessage = func(peer peer.IPeer, data []byte) {
+			for _, item := range service.messageCallback {
+				if item(peer, data) {
+					return
+				}
+			}
+		}
+	}
 }

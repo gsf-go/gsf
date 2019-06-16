@@ -69,11 +69,7 @@ func (tcpServer *TcpServer) Accept(config *network.NetConfig) {
 		case callback := <-closeDone:
 			connection, err, reason := callback()
 
-			if err != nil {
-				tcpServer.OnDisconnected(connection, reason)
-			} else {
-				tcpServer.OnDisconnected(connection, "Error")
-			}
+			tcpServer.OnDisconnected(connection, reason)
 
 			if tcpServer.OnError != nil {
 				tcpServer.OnError(connection, err)
@@ -113,7 +109,7 @@ func (tcpServer *TcpServer) handleClient(
 
 		if err != nil {
 			closeDone <- func() (network.IConnection, error, string) {
-				return connection, err, ""
+				return connection, err, "Error"
 			}
 			return
 		}
@@ -129,7 +125,7 @@ func (tcpServer *TcpServer) handleClient(
 		err = conn.SetWriteDeadline(deadline)
 		if err != nil {
 			closeDone <- func() (network.IConnection, error, string) {
-				return connection, err, ""
+				return connection, err, "Error"
 			}
 			return
 		}

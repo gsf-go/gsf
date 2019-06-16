@@ -37,7 +37,8 @@ func (clientSocket *ClientSocket) addListener(
 			return
 		}
 
-		GetInvokerInstance().Invoke(p, data)
+		invoker := NewInvoker()
+		invoker.Invoke(p, data)
 	}
 
 	client.OnError = func(connection network.IConnection, err error) {

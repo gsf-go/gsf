@@ -42,7 +42,8 @@ func TestSliceRefType(t *testing.T) {
 	array[1] = &b2
 
 	values := Show(t, array)
-	for _, v := range values[0].Interface().([]*bool) {
+	ret := values[0].Interface()
+	for _, v := range ret.([]*bool) {
 		t.Log(*v)
 	}
 }
@@ -53,8 +54,8 @@ func TestSliceValueType(t *testing.T) {
 	array[1] = "oooo"
 
 	values := Show(t, array)
-
-	for _, v := range values[0].Interface().([]string) {
+	ret := values[0].Interface()
+	for _, v := range ret.([]string) {
 		t.Log(v)
 	}
 }
@@ -119,4 +120,34 @@ func TestStructType2(t *testing.T) {
 	reader := NewEndianBinaryReader(bytes, nil)
 	sut2 := NewSerializablePacket("", 0)
 	sut2.FromBinaryReader(reader)
+}
+
+func TestSliceStruct(t *testing.T) {
+	GetPacketManagerInstance().AddPacket("SerializablePacket", func(args ...interface{}) ISerializablePacket {
+		return NewSerializablePacket("", 0)
+	})
+	sut := NewSerializablePacket("Test", 100)
+	slice := []*SerializablePacket{
+		sut,
+		sut,
+	}
+	values := Show(t, slice)
+	t.Log(values)
+}
+
+func TestMapStructType(t *testing.T) {
+
+	GetPacketManagerInstance().AddPacket("SerializablePacket", func(args ...interface{}) ISerializablePacket {
+		return NewSerializablePacket("", 0)
+	})
+
+	dict := make(map[string]*SerializablePacket)
+	dict["xx"] = NewSerializablePacket("11", 100)
+	dict["oo"] = NewSerializablePacket("22", 200)
+
+	values := Show(t, dict)
+	obj := values[0].Interface()
+	for k, v := range obj.(map[string]*SerializablePacket) {
+		t.Log(k + " " + string(v.name))
+	}
 }

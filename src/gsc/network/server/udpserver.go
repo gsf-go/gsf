@@ -52,11 +52,7 @@ func (udpServer *udpServer) Accept(config *network.NetConfig) {
 		case callback := <-errDone:
 			connection, err, reason := callback()
 
-			if err != nil {
-				udpServer.OnDisconnected(connection, reason)
-			} else {
-				udpServer.OnDisconnected(connection, "Error")
-			}
+			udpServer.OnDisconnected(connection, reason)
 
 			if udpServer.OnError != nil {
 				udpServer.OnError(connection, err)
@@ -100,7 +96,7 @@ func (udpServer *udpServer) handleClient(
 
 			if err != nil {
 				errChan <- func() (network.IConnection, error, string) {
-					return connection, err, ""
+					return connection, err, "Error"
 				}
 				return
 			}
@@ -116,7 +112,7 @@ func (udpServer *udpServer) handleClient(
 			err = packetConn.SetWriteDeadline(deadline)
 			if err != nil {
 				errChan <- func() (network.IConnection, error, string) {
-					return connection, err, ""
+					return connection, err, "Error"
 				}
 				return
 			}
