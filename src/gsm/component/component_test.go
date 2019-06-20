@@ -1,6 +1,7 @@
 package component
 
 import (
+	"github.com/sf-go/gsf/src/gsc/bytestream"
 	"github.com/sf-go/gsf/src/gsc/property"
 	"github.com/sf-go/gsf/src/gsc/serialization"
 	"github.com/sf-go/gsf/src/gsf/peer"
@@ -43,12 +44,13 @@ func TestComponent(t *testing.T) {
 	sut := NewUserComponent()
 	sut.SetValue("Account", "account")
 	sut.SetValue("Password", "123456")
-	writer := serialization.NewEndianBinaryWriter()
-	sut.ToBinaryWriter(writer)
-	bytes := writer.ToBytes()
+	writer := serialization.NewSerializable()
+	bytes := sut.ToBinaryWriter(writer)
+
 	sut.Account = ""
 	sut.Password = ""
-	reader := serialization.NewEndianBinaryReader(bytes, peer)
+
+	reader := serialization.NewDeserializable(bytestream.NewByteReader2(bytes))
 	sut2 := NewUserComponent()
 	sut2.FromBinaryReader(reader)
 }

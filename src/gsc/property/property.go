@@ -74,22 +74,22 @@ func (property *Property) Clear() {
 	})
 }
 
-func (property *Property) ToBinaryWriter(writer serialization.IEndianBinaryWriter) {
+func (property *Property) ToBinaryWriter(writer serialization.ISerializable) []byte {
 	values := make([]interface{}, 0)
 	property.record.Range(func(key, value interface{}) bool {
 		values = append(values, key, value)
 		return true
 	})
 	property.Clear()
-	writer.Write(values...)
+	return writer.Serialize(values...)
 }
 
-func (property *Property) FromBinaryReader(reader serialization.IEndianBinaryReader) {
-	values := reader.ReadValues()
+func (property *Property) FromBinaryReader(reader serialization.IDeserializable) {
+	values := reader.Deserialize()
 	length := len(values) / 2
 	for i := 0; i < length; i++ {
-		name := values[i*2].(string)
-		value := values[i*2+1]
+		name := values[i*2].Interface().(string)
+		value := values[i*2+1].Interface()
 		property.SetValue(name, value)
 	}
 }

@@ -1,6 +1,7 @@
 package property
 
 import (
+	"github.com/sf-go/gsf/src/gsc/bytestream"
 	"github.com/sf-go/gsf/src/gsc/serialization"
 	"testing"
 )
@@ -46,14 +47,13 @@ func TestSerialization(t *testing.T) {
 	user.SetValue("Age", 100)
 	t.Log(user.GetValue("Age"))
 
-	write := serialization.NewEndianBinaryWriter()
-	user.ToBinaryWriter(write)
-	bytes := write.ToBytes()
+	write := serialization.NewSerializable()
+	bytes := user.ToBinaryWriter(write)
 
 	user.Name = ""
 	user.Age = 0
 
-	reader := serialization.NewEndianBinaryReader(bytes, nil)
+	reader := serialization.NewDeserializable(bytestream.NewByteReader2(bytes))
 	user.FromBinaryReader(reader)
 
 	t.Log(user.Name)

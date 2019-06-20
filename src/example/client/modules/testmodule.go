@@ -27,7 +27,7 @@ func (testModule *TestClientModule) Initialize(service service.IService) {
 
 	testModule.AddController(controllers.NewTestController())
 	testModule.AddModel("TestModel", func(args ...interface{}) serialization.ISerializablePacket {
-		return new(models.TestModel)
+		return models.NewTestModel()
 	})
 	logger.Log.Debug("Initialize")
 }

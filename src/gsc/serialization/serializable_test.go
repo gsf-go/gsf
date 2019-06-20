@@ -1,6 +1,7 @@
 package serialization
 
 import (
+	"github.com/sf-go/gsf/src/gsc/bytestream"
 	"reflect"
 	"strconv"
 	"testing"
@@ -16,10 +17,9 @@ func TestValueType(t *testing.T) {
 
 func Show(t *testing.T, args ...interface{}) []reflect.Value {
 	ser := new(Serializable)
-	deser := new(Deserializable)
-
 	bytes := ser.Serialize(args...)
-	values := deser.Deserialize(bytes)
+	des := NewDeserializable(bytestream.NewByteReader2(bytes))
+	values := des.Deserialize()
 	return values
 }
 
@@ -91,12 +91,12 @@ func NewSerializablePacket(name string, age int) *SerializablePacket {
 	return &SerializablePacket{name: name, age: age}
 }
 
-func (serializablePacket *SerializablePacket) ToBinaryWriter(writer IEndianBinaryWriter) {
-	writer.Write(serializablePacket.name, serializablePacket.age)
+func (serializablePacket *SerializablePacket) ToBinaryWriter(writer ISerializable) []byte {
+	return writer.Serialize(serializablePacket.name, serializablePacket.age)
 }
 
-func (serializablePacket *SerializablePacket) FromBinaryReader(reader IEndianBinaryReader) {
-	reader.Read(&serializablePacket.name, &serializablePacket.age)
+func (serializablePacket *SerializablePacket) FromBinaryReader(reader IDeserializable) {
+	reader.Deserialize(&serializablePacket.name, &serializablePacket.age)
 }
 
 func TestStructType(t *testing.T) {
@@ -113,11 +113,11 @@ func TestStructType2(t *testing.T) {
 	GetPacketManagerInstance().AddPacket("SerializablePacket", func(args ...interface{}) ISerializablePacket {
 		return NewSerializablePacket("", 0)
 	})
+
 	sut := NewSerializablePacket("Test", 100)
-	writer := NewEndianBinaryWriter()
-	sut.ToBinaryWriter(writer)
-	bytes := writer.ToBytes()
-	reader := NewEndianBinaryReader(bytes, nil)
+	writer := NewSerializable()
+	bytes := sut.ToBinaryWriter(writer)
+	reader := NewDeserializable(bytestream.NewByteReader2(bytes))
 	sut2 := NewSerializablePacket("", 0)
 	sut2.FromBinaryReader(reader)
 }

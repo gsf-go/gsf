@@ -1,6 +1,6 @@
 package serialization
 
 type ISerializablePacket interface {
-	ToBinaryWriter(writer IEndianBinaryWriter)
-	FromBinaryReader(reader IEndianBinaryReader)
+	ToBinaryWriter(writer ISerializable) []byte
+	FromBinaryReader(reader IDeserializable)
 }

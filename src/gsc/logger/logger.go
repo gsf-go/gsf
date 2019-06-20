@@ -22,7 +22,11 @@ func (logger *Logger) SetConfig(config *LogConfig) {
 		for {
 			select {
 			case l, ok := <-logger.logChan:
-				if l != nil && ok {
+				if !ok {
+					return
+				}
+
+				if l != nil {
 					l()
 				}
 			}

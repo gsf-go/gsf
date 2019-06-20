@@ -6,60 +6,61 @@ import (
 )
 
 type IDeserializable interface {
-	Deserialize(bytes []byte, args ...interface{}) []reflect.Value
+	Deserialize(args ...interface{}) []reflect.Value
 }
 
 type Deserializable struct {
+	byteReader *bytestream.ByteReader
 }
 
-func NewDeserializable() *Deserializable {
-	return &Deserializable{}
+func NewDeserializable(byteReader *bytestream.ByteReader) *Deserializable {
+	return &Deserializable{
+		byteReader: byteReader,
+	}
 }
 
-func (deserializable *Deserializable) Deserialize(bytes []byte, args ...interface{}) []reflect.Value {
+func (deserializable *Deserializable) Deserialize(args ...interface{}) []reflect.Value {
 
-	byteReader := bytestream.NewByteReader2(bytes)
 	objects := make([]reflect.Value, 0)
-
-	length := deserializeValue(byteReader).Interface().(uint8)
+	length := deserializable.deserializeValue(deserializable.byteReader).Interface().(uint8)
 
 	for i := uint8(0); i < length; i++ {
-		value := DeserializeSingle(byteReader, args...)
+		value := deserializable.DeserializeSingle(deserializable.byteReader, args...)
 		objects = append(objects, value)
 	}
 
 	return objects
 }
 
-func DeserializeSingle(byteReader *bytestream.ByteReader, args ...interface{}) reflect.Value {
+func (deserializable *Deserializable) DeserializeSingle(byteReader *bytestream.ByteReader, args ...interface{}) reflect.Value {
 
 	// 反序列值类型
-	if data := deserializeValue(byteReader); data != reflect.ValueOf(nil) {
+	if data := deserializable.deserializeValue(byteReader); data != reflect.ValueOf(nil) {
 		return data
 	}
 
 	// 反序列化引用类型
-	if data := deserializeRef(byteReader); data != reflect.ValueOf(nil) {
+	if data := deserializable.deserializeRef(byteReader); data != reflect.ValueOf(nil) {
 		return data
 	}
 
 	// 反序列化切片类型
-	if data := deserializeSlice(byteReader); data != reflect.ValueOf(nil) {
+	if data := deserializable.deserializeSlice(byteReader); data != reflect.ValueOf(nil) {
 		return data
 	}
 
 	// 反序列化映射类型
-	if data := deserializeMap(byteReader); data != reflect.ValueOf(nil) {
+	if data := deserializable.deserializeMap(byteReader); data != reflect.ValueOf(nil) {
 		return data
 	}
 
-	if data := deserializeStruct(byteReader, args...); data != reflect.ValueOf(nil) {
+	if data := deserializable.deserializeStruct(byteReader, args...); data != reflect.ValueOf(nil) {
 		return data
 	}
 	return reflect.ValueOf(nil)
 }
 
-func deserializeValue(byteReader *bytestream.ByteReader) reflect.Value {
+func (deserializable *Deserializable) deserializeValue(byteReader *bytestream.ByteReader) reflect.Value {
 
 	typeValue := uint8(0)
 	byteReader.Read(&typeValue)
@@ -82,7 +83,7 @@ func deserializeValue(byteReader *bytestream.ByteReader) reflect.Value {
 	return reflect.ValueOf(obj).Elem()
 }
 
-func deserializeRef(byteReader *bytestream.ByteReader) reflect.Value {
+func (deserializable *Deserializable) deserializeRef(byteReader *bytestream.ByteReader) reflect.Value {
 
 	typeValue := uint8(0)
 	byteReader.Read(&typeValue)
@@ -107,7 +108,7 @@ func deserializeRef(byteReader *bytestream.ByteReader) reflect.Value {
 	return reflect.ValueOf(obj)
 }
 
-func deserializeSlice(byteReader *bytestream.ByteReader, args ...interface{}) reflect.Value {
+func (deserializable *Deserializable) deserializeSlice(byteReader *bytestream.ByteReader, args ...interface{}) reflect.Value {
 
 	typeValue := uint8(0)
 	byteReader.Read(&typeValue)
@@ -122,14 +123,14 @@ func deserializeSlice(byteReader *bytestream.ByteReader, args ...interface{}) re
 	kind = reflect.Kind(typeValue)
 
 	if kind == reflect.Ptr {
-		return deserializeSlicePtr(byteReader, args...)
+		return deserializable.deserializeSlicePtr(byteReader, args...)
 	}
 
 	byteReader.Shift(-1)
-	return deserializeSliceValue(byteReader, args...)
+	return deserializable.deserializeSliceValue(byteReader, args...)
 }
 
-func deserializeSliceValue(byteReader *bytestream.ByteReader, args ...interface{}) reflect.Value {
+func (deserializable *Deserializable) deserializeSliceValue(byteReader *bytestream.ByteReader, args ...interface{}) reflect.Value {
 
 	typeValue := uint8(0)
 	byteReader.Read(&typeValue)
@@ -159,7 +160,7 @@ func deserializeSliceValue(byteReader *bytestream.ByteReader, args ...interface{
 	for i := uint16(0); i < valueLength; i++ {
 		if kind == reflect.Struct {
 			byteReader.Shift(2)
-			slice.Index(int(i)).Set(deserializeStruct(byteReader, args...).Elem())
+			slice.Index(int(i)).Set(deserializable.deserializeStruct(byteReader, args...).Elem())
 		} else {
 			obj := generate(params...)
 			byteReader.Read(obj)
@@ -169,7 +170,7 @@ func deserializeSliceValue(byteReader *bytestream.ByteReader, args ...interface{
 	return slice
 }
 
-func deserializeSlicePtr(byteReader *bytestream.ByteReader, args ...interface{}) reflect.Value {
+func (deserializable *Deserializable) deserializeSlicePtr(byteReader *bytestream.ByteReader, args ...interface{}) reflect.Value {
 
 	typeValue := uint8(0)
 	byteReader.Read(&typeValue)
@@ -201,7 +202,7 @@ func deserializeSlicePtr(byteReader *bytestream.ByteReader, args ...interface{})
 	for i := uint16(0); i < valueLength; i++ {
 		if kind == reflect.Struct {
 			byteReader.Shift(2)
-			slice.Index(int(i)).Set(deserializeStruct(byteReader, args...))
+			slice.Index(int(i)).Set(deserializable.deserializeStruct(byteReader, args...))
 		} else {
 			obj := generate(params...)
 			byteReader.Read(obj)
@@ -211,7 +212,7 @@ func deserializeSlicePtr(byteReader *bytestream.ByteReader, args ...interface{})
 	return slice
 }
 
-func deserializeMap(byteReader *bytestream.ByteReader, args ...interface{}) reflect.Value {
+func (deserializable *Deserializable) deserializeMap(byteReader *bytestream.ByteReader, args ...interface{}) reflect.Value {
 
 	typeValue := uint8(0)
 	byteReader.Read(&typeValue)
@@ -226,14 +227,14 @@ func deserializeMap(byteReader *bytestream.ByteReader, args ...interface{}) refl
 	valueKind := reflect.Kind(typeValue)
 
 	if valueKind == reflect.Ptr {
-		return deserializeMapPtrStruct(byteReader, args...)
+		return deserializable.deserializeMapPtrStruct(byteReader, args...)
 	}
 
 	byteReader.Shift(-1)
-	return deserializeMapValueStruct(byteReader, args...)
+	return deserializable.deserializeMapValueStruct(byteReader, args...)
 }
 
-func deserializeMap2(byteReader *bytestream.ByteReader) reflect.Value {
+func (deserializable *Deserializable) deserializeMap2(byteReader *bytestream.ByteReader) reflect.Value {
 
 	typeValue := uint8(0)
 	byteReader.Read(&typeValue)
@@ -287,7 +288,7 @@ func deserializeMap2(byteReader *bytestream.ByteReader) reflect.Value {
 	return maps
 }
 
-func deserializeMapValueStruct(byteReader *bytestream.ByteReader, args ...interface{}) reflect.Value {
+func (deserializable *Deserializable) deserializeMapValueStruct(byteReader *bytestream.ByteReader, args ...interface{}) reflect.Value {
 	typeValue := uint8(0)
 	byteReader.Read(&typeValue)
 	valueKind := reflect.Kind(typeValue)
@@ -328,7 +329,7 @@ func deserializeMapValueStruct(byteReader *bytestream.ByteReader, args ...interf
 
 		if valueKind == reflect.Struct {
 			byteReader.Shift(2)
-			maps.SetMapIndex(reflect.ValueOf(keyObj).Elem(), deserializeStruct(byteReader, args...).Elem())
+			maps.SetMapIndex(reflect.ValueOf(keyObj).Elem(), deserializable.deserializeStruct(byteReader, args...).Elem())
 		} else {
 			valueObj := valueGenerate(params...)
 			byteReader.Read(valueObj)
@@ -339,7 +340,7 @@ func deserializeMapValueStruct(byteReader *bytestream.ByteReader, args ...interf
 	return maps
 }
 
-func deserializeMapPtrStruct(byteReader *bytestream.ByteReader, args ...interface{}) reflect.Value {
+func (deserializable *Deserializable) deserializeMapPtrStruct(byteReader *bytestream.ByteReader, args ...interface{}) reflect.Value {
 	typeValue := uint8(0)
 	byteReader.Read(&typeValue)
 	valueKind := reflect.Kind(typeValue)
@@ -380,7 +381,7 @@ func deserializeMapPtrStruct(byteReader *bytestream.ByteReader, args ...interfac
 
 		if valueKind == reflect.Struct {
 			byteReader.Shift(2)
-			maps.SetMapIndex(reflect.ValueOf(keyObj).Elem(), deserializeStruct(byteReader, args...))
+			maps.SetMapIndex(reflect.ValueOf(keyObj).Elem(), deserializable.deserializeStruct(byteReader, args...))
 		} else {
 			valueObj := valueGenerate(params...)
 			byteReader.Read(valueObj)
@@ -391,7 +392,7 @@ func deserializeMapPtrStruct(byteReader *bytestream.ByteReader, args ...interfac
 	return maps
 }
 
-func deserializeStruct(byteReader *bytestream.ByteReader, args ...interface{}) reflect.Value {
+func (deserializable *Deserializable) deserializeStruct(byteReader *bytestream.ByteReader, args ...interface{}) reflect.Value {
 
 	typeValue := uint8(0)
 	byteReader.Read(&typeValue)
@@ -412,16 +413,11 @@ func deserializeStruct(byteReader *bytestream.ByteReader, args ...interface{}) r
 	value := valueGenerate(append(append(make([]interface{}, 0), name), args...)...)
 	packet := value.(ISerializablePacket)
 
-	data := []byte(nil)
-	byteReader.Read(&data)
+	length := uint16(0)
+	byteReader.Read(&length)
 
-	tmp := interface{}(nil)
-	if len(args) != 0 {
-		tmp = args[0]
-	}
-
-	reader := NewEndianBinaryReader(data, tmp)
-	packet.FromBinaryReader(reader)
+	deser := NewDeserializable(byteReader)
+	packet.FromBinaryReader(deser)
 
 	return reflect.ValueOf(packet)
 }

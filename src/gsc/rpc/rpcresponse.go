@@ -1,6 +1,7 @@
 package rpc
 
 import (
+	"github.com/sf-go/gsf/src/gsc/bytestream"
 	"github.com/sf-go/gsf/src/gsc/serialization"
 	"reflect"
 )
@@ -10,16 +11,15 @@ type IRpcResponse interface {
 }
 
 type RpcResponse struct {
-	deserializable *serialization.Deserializable
 }
 
 func NewRpcResponse() *RpcResponse {
-	return &RpcResponse{
-		deserializable: serialization.NewDeserializable(),
-	}
+	return &RpcResponse{}
 }
 
 func (rpcResponse *RpcResponse) Response(data []byte, args ...interface{}) []reflect.Value {
-	result := rpcResponse.deserializable.Deserialize(data, args...)
+	byteReader := bytestream.NewByteReader2(data)
+	deserializable := serialization.NewDeserializable(byteReader)
+	result := deserializable.Deserialize(args...)
 	return result
 }
