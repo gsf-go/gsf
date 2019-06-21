@@ -8,15 +8,19 @@ import (
 )
 
 func TestValueType(t *testing.T) {
-	values := Show(t, 100, "hehe", nil)
+
+	ser := NewSerializable()
+	bytes := ser.Serialize(100, "hehe")
+	des := NewDeserializable(bytestream.NewByteReader2(bytes))
+	values := des.Deserialize()
 
 	for _, v := range values {
 		t.Log(v.Interface())
 	}
 }
 
-func Show(t *testing.T, args ...interface{}) []reflect.Value {
-	ser := new(Serializable)
+func Show(args ...interface{}) []reflect.Value {
+	ser := NewSerializable()
 	bytes := ser.Serialize(args...)
 	des := NewDeserializable(bytestream.NewByteReader2(bytes))
 	values := des.Deserialize()
@@ -27,7 +31,7 @@ func TestRefType(t *testing.T) {
 	num := 100
 	str := "hehe"
 
-	values := Show(t, &num, &str)
+	values := Show(&num, &str)
 
 	for _, v := range values {
 		t.Log(v.Elem().Interface())
@@ -41,7 +45,7 @@ func TestSliceRefType(t *testing.T) {
 	array[0] = &b1
 	array[1] = &b2
 
-	values := Show(t, array)
+	values := Show(array)
 	ret := values[0].Interface()
 	for _, v := range ret.([]*bool) {
 		t.Log(*v)
@@ -53,7 +57,7 @@ func TestSliceValueType(t *testing.T) {
 	array[0] = "xxxx"
 	array[1] = "oooo"
 
-	values := Show(t, array)
+	values := Show(array)
 	ret := values[0].Interface()
 	for _, v := range ret.([]string) {
 		t.Log(v)
@@ -65,7 +69,7 @@ func TestArrayValueType2(t *testing.T) {
 	array[0] = 3.1
 	array[1] = 4.2
 
-	values := Show(t, array)
+	values := Show(array)
 	for _, v := range values[0].Interface().([]float32) {
 		t.Log(v)
 	}
@@ -76,7 +80,7 @@ func TestMapType(t *testing.T) {
 	dict["xx"] = 50
 	dict["oo"] = 50
 
-	values := Show(t, dict)
+	values := Show(dict)
 	for k, v := range values[0].Interface().(map[string]int32) {
 		t.Log(k + " " + strconv.Itoa(int(v)))
 	}
@@ -104,7 +108,7 @@ func TestStructType(t *testing.T) {
 		return NewSerializablePacket("", 0)
 	})
 	sut := NewSerializablePacket("Test", 100)
-	values := Show(t, sut)
+	values := Show(sut)
 	packet := values[0].Interface().(*SerializablePacket)
 	t.Log(packet.name + " " + strconv.Itoa(packet.age))
 }
@@ -131,7 +135,7 @@ func TestSliceStruct(t *testing.T) {
 		sut,
 		sut,
 	}
-	values := Show(t, slice)
+	values := Show(slice)
 	t.Log(values)
 }
 
@@ -145,7 +149,7 @@ func TestMapStructType(t *testing.T) {
 	dict["xx"] = NewSerializablePacket("11", 100)
 	dict["oo"] = NewSerializablePacket("22", 200)
 
-	values := Show(t, dict)
+	values := Show(dict)
 	obj := values[0].Interface()
 	for k, v := range obj.(map[string]*SerializablePacket) {
 		t.Log(k + " " + string(v.name))
