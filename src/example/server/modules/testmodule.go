@@ -48,3 +48,7 @@ func (testModule *TestServerModule) Connected(peer peer.IPeer) {
 	logger.Log.Debug("Connected")
 	peer.AddComponent(components.NewUserComponent())
 }
+
+func (testModule *TestServerModule) Disconnected(peer peer.IPeer) {
+	logger.Log.Debug("Disconnected")
+}

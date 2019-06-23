@@ -29,8 +29,8 @@ func (byteReader *ByteReader) Shift(offset int64) {
 	}
 }
 
-func (byteReader *ByteReader) IsEOF() bool {
-	return byteReader.reader.Len() == 0
+func (byteReader *ByteReader) GetPosition() int {
+	return byteReader.reader.Len()
 }
 
 func (byteReader *ByteReader) Read(data interface{}) {
@@ -58,8 +58,7 @@ func (byteReader *ByteReader) Read(data interface{}) {
 			panic(err)
 		}
 
-		dataLength := int(length) - binary.Size(uint16(0))
-		bytes := make([]byte, dataLength)
+		bytes := make([]byte, length)
 
 		err = binary.Read(byteReader.reader, byteReader.Order, bytes)
 		if err != nil {
@@ -77,8 +76,7 @@ func (byteReader *ByteReader) Read(data interface{}) {
 			panic(err)
 		}
 
-		dataLength := int(length) - binary.Size(uint16(0))
-		bytes := make([]byte, dataLength)
+		bytes := make([]byte, length)
 
 		err = binary.Read(byteReader.reader, byteReader.Order, bytes)
 		if err != nil {

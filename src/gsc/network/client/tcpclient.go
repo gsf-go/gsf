@@ -98,14 +98,18 @@ func (tcpClient *TcpClient) read(
 	errChan chan<- func() (network.IConnection, error, string),
 	connection network.IConnection) {
 
-	offset := uint16(0)
+	packet := &network.Packet{
+		Config:     config,
+		Buffer:     buffer,
+		Connection: connection,
+	}
 
 	for {
 		select {
 		case <-tcpClient.context.Done():
 			return
 		default:
-			n, err := conn.Read(buffer)
+			n, err := conn.Read(buffer[packet.Offset:])
 			if err != nil {
 				errChan <- func() (network.IConnection, error, string) {
 					return connection, err, "Error"
@@ -129,10 +133,8 @@ func (tcpClient *TcpClient) read(
 				return
 			}
 
-			offset += tcpClient.handleData(
-				config,
-				connection,
-				buffer[0:uint16(n)+offset])
+			packet.Offset += uint16(n)
+			tcpClient.handle.ReadHandle(packet, tcpClient.post)
 		}
 	}
 
@@ -149,20 +151,6 @@ func (tcpClient *TcpClient) close(reason string) {
 	tcpClient.OnConnected = nil
 	tcpClient.OnDisconnected = nil
 	tcpClient.OnError = nil
-}
-
-func (tcpClient *TcpClient) handleData(
-	config *network.NetConfig,
-	connection network.IConnection,
-	buffer []byte) uint16 {
-
-	packet := &network.Packet{
-		Config:     config,
-		Buffer:     buffer,
-		Connection: connection,
-	}
-
-	return tcpClient.handle.ReadHandle(packet, tcpClient.post)
 }
 
 func (tcpClient *TcpClient) post(connection network.IConnection, data []byte) {

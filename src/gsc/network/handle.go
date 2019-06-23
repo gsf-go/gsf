@@ -7,7 +7,7 @@ import (
 type HandleCallback func(connection IConnection, data []byte)
 
 type IHandle interface {
-	ReadHandle(packet *Packet, handleCallback HandleCallback) uint16
+	ReadHandle(packet *Packet, handleCallback HandleCallback)
 	WriteHandle(data []byte) []byte
 }
 
@@ -20,27 +20,28 @@ func NewHandle() *Handle {
 
 func (handle *Handle) ReadHandle(
 	packet *Packet,
-	handleCallback HandleCallback) uint16 {
+	handleCallback HandleCallback) {
 
-	count := uint16(len(packet.Buffer))
 	verifyLength := uint16(2)
 
-	if count > verifyLength {
+	if packet.Offset > verifyLength {
 		byteArray := bytestream.NewByteReader2(packet.Buffer)
 		length := uint16(0)
 		byteArray.Read(&length)
+		total := length + verifyLength
 
-		if length <= count {
+		if total <= packet.Offset {
 			if handleCallback != nil {
 				handleCallback(packet.Connection, packet.Buffer[verifyLength:])
 			}
 
-			copy(packet.Buffer[0:count-length], packet.Buffer[length:count])
-			packet.Buffer = packet.Buffer[0 : count-length]
-			count = handle.ReadHandle(packet, handleCallback)
+			copy(packet.Buffer[0:packet.Offset-total], packet.Buffer[total:packet.Offset])
+			packet.Offset = packet.Offset - total
+			if packet.Offset > 0 {
+				handle.ReadHandle(packet, handleCallback)
+			}
 		}
 	}
-	return count
 }
 
 func (handle *Handle) WriteHandle(data []byte) []byte {

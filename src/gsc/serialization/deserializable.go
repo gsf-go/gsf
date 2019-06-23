@@ -21,12 +21,12 @@ func NewDeserializable(byteReader *bytestream.ByteReader) *Deserializable {
 
 func (deserializable *Deserializable) Deserialize(args ...interface{}) []reflect.Value {
 
-	objects := make([]reflect.Value, 0)
 	length := deserializable.deserializeValue(deserializable.byteReader).Interface().(uint8)
+	objects := make([]reflect.Value, length)
 
 	for i := uint8(0); i < length; i++ {
 		value := deserializable.DeserializeSingle(deserializable.byteReader, args...)
-		objects = append(objects, value)
+		objects[i] = value
 	}
 
 	return objects

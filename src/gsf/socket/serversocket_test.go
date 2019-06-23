@@ -14,7 +14,7 @@ func TestServerSocket(t *testing.T) {
 	config := network.NewNetConfig()
 	config.BufferSize = 50
 	config.Address = "127.0.0.1"
-	config.Port = 8889
+	config.Port = 5678
 	config.ConnectTimeout = 3
 
 	rpc.GetRpcRegisterInstance().Add("Func",
@@ -48,5 +48,5 @@ func TestServerSocket(t *testing.T) {
 		response.Response(data, peer)
 	}
 	clientSocket.Connect(config)
-	time.Sleep(time.Second * 5)
+	time.Sleep(time.Second * 3)
 }

@@ -22,30 +22,29 @@ func (invoker *invoker) Invoke(peer peer.IPeer, data []byte) {
 	}()
 
 	response := rpc.NewRpcResponse()
-	result := response.Response(data, peer)
-
+	methodId, result := response.Response(data, peer)
 	if len(result) == 0 {
 		return
 	}
-	messageId := result[0].String()
-	method := rpc.GetRpcRegisterInstance().GetRpcByName(messageId)
+
+	method := rpc.GetRpcRegisterInstance().GetRpcByName(methodId)
 	if method == nil {
-		logger.Log.Error("没有注册ID:" + messageId + "的RPC")
+		logger.Log.Error("没有注册ID:" + methodId + "的RPC")
 		return
 	}
 
-	value := method(peer, result[1:])
+	value := method(peer, result)
 	values := make([]interface{}, len(value))
 	for i, item := range value {
 		values[i] = item.Interface()
 	}
 
-	if strings.Contains(messageId, "#") {
+	if strings.Contains(methodId, "#") {
 		return
 	}
 
 	invoke := rpc.NewRpcInvoke()
-	bytes := invoke.Request("#"+messageId, values...)
+	bytes := invoke.Request("#"+methodId, values...)
 	connection := peer.GetConnection()
 	if connection != nil {
 		connection.Send(bytes)

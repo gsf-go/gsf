@@ -32,6 +32,6 @@ func TestRpc2(t *testing.T) {
 	ret := request.Request("Func", 100, "xxxxx")
 
 	response := NewRpcResponse()
-	res := response.Response(ret)
+	res, _ := response.Response(ret)
 	t.Log(res)
 }

@@ -51,7 +51,7 @@ func (byteWriter *ByteWriter) Write(data interface{}) {
 			panic(err)
 		}
 	case string:
-		length := uint16(len(data) + binary.Size(uint16(0)))
+		length := uint16(len(data))
 		err := binary.Write(byteWriter.buffer, byteWriter.Order, length)
 		if err != nil {
 			panic(err)
@@ -63,7 +63,7 @@ func (byteWriter *ByteWriter) Write(data interface{}) {
 			panic(err)
 		}
 	case *string:
-		length := uint16(len(*data) + binary.Size(uint16(0)))
+		length := uint16(len(*data))
 		err := binary.Write(byteWriter.buffer, byteWriter.Order, length)
 		if err != nil {
 			panic(err)
@@ -77,7 +77,7 @@ func (byteWriter *ByteWriter) Write(data interface{}) {
 	case nil:
 		return
 	case []byte:
-		length := uint16(len(data) + binary.Size(uint16(0)))
+		length := uint16(len(data))
 		err := binary.Write(byteWriter.buffer, byteWriter.Order, length)
 		if err != nil {
 			panic(err)

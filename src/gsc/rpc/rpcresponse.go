@@ -17,9 +17,10 @@ func NewRpcResponse() *RpcResponse {
 	return &RpcResponse{}
 }
 
-func (rpcResponse *RpcResponse) Response(data []byte, args ...interface{}) []reflect.Value {
+func (rpcResponse *RpcResponse) Response(data []byte, args ...interface{}) (string, []reflect.Value) {
 	byteReader := bytestream.NewByteReader2(data)
 	deserializable := serialization.NewDeserializable(byteReader)
 	result := deserializable.Deserialize(args...)
-	return result
+	methodId := result[0].Interface().(string)
+	return methodId, result[1:]
 }

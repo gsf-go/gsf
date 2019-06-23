@@ -27,7 +27,7 @@ func (application *Application) SetLogConfig(config *logger.LogConfig) {
 func (application *Application) SetNetConfig(config *network.NetConfig) {
 	config.BufferSize = 65535
 	config.Address = "127.0.0.1"
-	config.Port = 8889
+	config.Port = 6666
 	config.ConnectTimeout = 3
 }
 

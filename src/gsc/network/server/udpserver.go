@@ -73,11 +73,12 @@ func (udpServer *udpServer) handleClient(
 			return
 		default:
 			buffer := bufferPool.GetBuffer()
-
 			byteArray := buffer.Bytes()
-			offset := uint16(0)
-
-			n, addr, err := packetConn.ReadFrom(byteArray[offset:])
+			packet := &network.Packet{
+				Config: config,
+				Buffer: byteArray,
+			}
+			n, addr, err := packetConn.ReadFrom(byteArray)
 			connection := udpServer.connectionPool.GetConnection(addr.String())
 			if connection == nil {
 				connection = network.NewConnection(
@@ -94,6 +95,7 @@ func (udpServer *udpServer) handleClient(
 				udpServer.connectionPool.AddConnection(addr.String(), connection)
 			}
 
+			packet.Connection = connection
 			if err != nil {
 				errChan <- func() (network.IConnection, error, string) {
 					return connection, err, "Error"
@@ -117,24 +119,16 @@ func (udpServer *udpServer) handleClient(
 				return
 			}
 
-			offset += udpServer.handleData(config, connection,
-				byteArray[0:uint16(n)+offset])
+			packet.Offset = uint16(n)
+			go func() {
+				defer func() {
+					bufferPool.Recycle(buffer)
+				}()
+
+				udpServer.handle.ReadHandle(packet, udpServer.post)
+			}()
 		}
 	}
-}
-
-func (udpServer *udpServer) handleData(
-	config *network.NetConfig,
-	connection network.IConnection,
-	buffer []byte) uint16 {
-
-	packet := &network.Packet{
-		Config:     config,
-		Buffer:     buffer,
-		Connection: connection,
-	}
-
-	return udpServer.handle.ReadHandle(packet, udpServer.post)
 }
 
 func (udpServer *udpServer) post(connection network.IConnection, data []byte) {

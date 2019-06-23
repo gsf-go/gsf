@@ -33,6 +33,14 @@ func (testController *TestController) Initialize() {
 			logger.Log.Debug("oooooooooooooooooooo")
 		}
 	})
+
+	testController.Register("Test2", func() interface{} {
+		return testController.Test2
+	}, nil, nil)
+}
+
+func (testController *TestController) Test2(num int32, peer peer.IPeer) int32 {
+	return num + 10000
 }
 
 func (testController *TestController) Test(num int, testmodel *models.TestModel, peer peer.IPeer) int {

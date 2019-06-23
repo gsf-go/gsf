@@ -25,7 +25,7 @@ func (bytePool *BytePool) GetBuffer() *bytes.Buffer {
 }
 
 func (bytePool *BytePool) Recycle(obj interface{}) {
-	buffer := obj.(*bytes.Buffer)
-	buffer.Reset()
+	//buffer := obj.(*bytes.Buffer)
+	//buffer.Reset()
 	bytePool.pool.Put(obj)
 }

@@ -104,7 +104,11 @@ func (udpClient *udpClient) read(
 	errChan chan<- func() (network.IConnection, error, string),
 	connection network.IConnection) {
 
-	offset := uint16(0)
+	packet := &network.Packet{
+		Config:     config,
+		Buffer:     buffer,
+		Connection: connection,
+	}
 
 	for {
 		select {
@@ -134,10 +138,8 @@ func (udpClient *udpClient) read(
 				return
 			}
 
-			offset += udpClient.handleData(
-				config,
-				connection,
-				buffer[0:uint16(n)+offset])
+			packet.Offset = uint16(n)
+			udpClient.handle.ReadHandle(packet, udpClient.post)
 		}
 	}
 
@@ -154,20 +156,6 @@ func (udpClient *udpClient) close(reason string) {
 	udpClient.OnConnected = nil
 	udpClient.OnDisconnected = nil
 	udpClient.OnError = nil
-}
-
-func (udpClient *udpClient) handleData(
-	config *network.NetConfig,
-	connection network.IConnection,
-	buffer []byte) uint16 {
-
-	packet := &network.Packet{
-		Config:     config,
-		Buffer:     buffer,
-		Connection: connection,
-	}
-
-	return udpClient.handle.ReadHandle(packet, udpClient.post)
 }
 
 func (udpClient *udpClient) post(connection network.IConnection, data []byte) {

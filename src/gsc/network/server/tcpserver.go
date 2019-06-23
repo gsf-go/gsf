@@ -65,14 +65,18 @@ func (tcpServer *TcpServer) Accept(config *network.NetConfig) {
 	}()
 
 	go func() {
-		select {
-		case callback := <-closeDone:
-			connection, err, reason := callback()
+		for {
+			select {
+			case <-tcpServer.context.Done():
+				return
+			case callback := <-closeDone:
+				connection, err, reason := callback()
 
-			tcpServer.OnDisconnected(connection, reason)
+				tcpServer.OnDisconnected(connection, reason)
 
-			if tcpServer.OnError != nil {
-				tcpServer.OnError(connection, err)
+				if tcpServer.OnError != nil {
+					tcpServer.OnError(connection, err)
+				}
 			}
 		}
 	}()
@@ -102,10 +106,16 @@ func (tcpServer *TcpServer) handleClient(
 	}()
 
 	byteArray := buffer.Bytes()
-	offset := uint16(0)
+	packet := &network.Packet{
+		Config:     config,
+		Buffer:     byteArray,
+		Connection: connection,
+	}
 
 	for {
-		n, err := conn.Read(byteArray[offset:])
+		logger.Log.Info("Offset " + strconv.Itoa(int(packet.Offset)))
+		n, err := conn.Read(byteArray[packet.Offset:])
+		logger.Log.Info("Recv %d", n)
 
 		if err != nil {
 			closeDone <- func() (network.IConnection, error, string) {
@@ -130,27 +140,9 @@ func (tcpServer *TcpServer) handleClient(
 			return
 		}
 
-		offset += tcpServer.handleData(
-			config,
-			connection,
-			byteArray[0:uint16(n)+offset])
+		packet.Offset += uint16(n)
+		tcpServer.handle.ReadHandle(packet, tcpServer.post)
 	}
-}
-
-func (tcpServer *TcpServer) handleData(
-	config *network.NetConfig,
-	connection network.IConnection,
-	buffer []byte) uint16 {
-
-	packet := &network.Packet{
-		Config:     config,
-		Buffer:     buffer,
-		Connection: connection,
-	}
-
-	return tcpServer.handle.ReadHandle(
-		packet,
-		tcpServer.post)
 }
 
 func (tcpServer *TcpServer) post(connection network.IConnection, data []byte) {
