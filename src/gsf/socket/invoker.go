@@ -27,7 +27,7 @@ func (invoker *invoker) Invoke(peer peer.IPeer, data []byte) {
 		return
 	}
 
-	method := rpc.GetRpcRegisterInstance().GetRpcByName(methodId)
+	method := rpc.RpcRegisterInstance.GetRpcByName(methodId)
 	if method == nil {
 		logger.Log.Error("没有注册ID:" + methodId + "的RPC")
 		return

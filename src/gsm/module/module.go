@@ -23,7 +23,7 @@ func (module *Module) AddController(controller controller.IController) {
 }
 
 func (module *Module) AddModel(name string, generate func(args ...interface{}) serialization.ISerializablePacket) {
-	serialization.GetPacketManagerInstance().AddPacket(name, generate)
+	serialization.PacketManagerInstance.AddPacket(name, generate)
 }
 
 func (module *Module) Initialize(service service.IService) {

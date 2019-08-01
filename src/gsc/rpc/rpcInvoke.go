@@ -23,7 +23,7 @@ func NewRpcInvoke() *RpcInvoke {
 
 func (rpcInvoke *RpcInvoke) Invoke(methodId string, peer peer.IPeer, args ...interface{}) []reflect.Value {
 
-	method := GetRpcRegisterInstance().GetRpcByName(methodId)
+	method := RpcRegisterInstance.GetRpcByName(methodId)
 	values := make([]reflect.Value, len(args))
 
 	for i, item := range args {

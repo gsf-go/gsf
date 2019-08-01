@@ -41,7 +41,7 @@ func (controller *Controller) Register(
 		}
 	}
 
-	rpcRegister := rpc.GetRpcRegisterInstance()
+	rpcRegister := rpc.RpcRegisterInstance
 	beforeValue := reflect.ValueOf(nil)
 	if before != nil {
 		beforeValue = reflect.ValueOf(before())
@@ -93,7 +93,7 @@ func (controller *Controller) Invoke(
 		close(resultChan)
 	}()
 
-	rpcRegister := rpc.GetRpcRegisterInstance()
+	rpcRegister := rpc.RpcRegisterInstance
 	rpcRegister.Add("#"+name, func(_ peer.IPeer, values []reflect.Value) []reflect.Value {
 
 		response := make([]interface{}, len(values))
@@ -147,7 +147,7 @@ func (controller *Controller) AsyncInvoke(
 		return
 	}
 
-	rpcRegister := rpc.GetRpcRegisterInstance()
+	rpcRegister := rpc.RpcRegisterInstance
 	rpcRegister.Add("#"+name, func(_ peer.IPeer, values []reflect.Value) []reflect.Value {
 
 		response := make([]interface{}, len(values))

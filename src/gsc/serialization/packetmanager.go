@@ -6,15 +6,7 @@ import (
 
 //go:generate ../../../gen/Singleton.exe -struct=PacketManager -out=./packetmanager.go
 
-var PacketManagerInstance *PacketManager
-var PacketManagerOnce sync.Once
-
-func GetPacketManagerInstance() *PacketManager {
-	PacketManagerOnce.Do(func() {
-		PacketManagerInstance = NewPacketManager()
-	})
-	return PacketManagerInstance
-}
+var PacketManagerInstance = NewPacketManager()
 
 type PacketManager struct {
 	packets *sync.Map

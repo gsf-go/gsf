@@ -92,7 +92,7 @@ func initVar() {
 
 	GenerateVar[reflect.Struct] = func(params ...interface{}) interface{} {
 		name := params[0].(string)
-		packet := GetPacketManagerInstance().GetPacket(name)
+		packet := PacketManagerInstance.GetPacket(name)
 		if packet != nil {
 			return packet(params...)
 		}
@@ -163,7 +163,7 @@ func initType() {
 
 	KindType[reflect.Struct] = func(params ...interface{}) reflect.Type {
 		name := params[0].(string)
-		packet := GetPacketManagerInstance().GetPacket(name)
+		packet := PacketManagerInstance.GetPacket(name)
 		if packet != nil {
 			return reflect.TypeOf(packet(params...))
 		}
@@ -250,7 +250,7 @@ func initPtrType() {
 
 	KindPtrType[reflect.Struct] = func(params ...interface{}) reflect.Type {
 		name := params[0].(string)
-		packet := GetPacketManagerInstance().GetPacket(name)
+		packet := PacketManagerInstance.GetPacket(name)
 		if packet != nil {
 			return reflect.TypeOf(packet(params...))
 		}

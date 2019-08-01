@@ -8,37 +8,29 @@ import (
 
 //go:generate ../../../gen/Singleton.exe -struct=rpcRegister -out=./rpcregister.go
 
-var rpcRegisterInstance *rpcRegister
-var rpcRegisterOnce sync.Once
+var RpcRegisterInstance = NewRpcRegister()
 
-func GetRpcRegisterInstance() *rpcRegister {
-	rpcRegisterOnce.Do(func() {
-		rpcRegisterInstance = NewRpcRegister()
-	})
-	return rpcRegisterInstance
-}
-
-type rpcRegister struct {
+type RpcRegister struct {
 	cache *sync.Map
 }
 
-func NewRpcRegister() *rpcRegister {
-	return &rpcRegister{
+func NewRpcRegister() *RpcRegister {
+	return &RpcRegister{
 		cache: new(sync.Map),
 	}
 }
 
-func (rpcRegister *rpcRegister) Add(name string,
+func (rpcRegister *RpcRegister) Add(name string,
 	method func(peer peer.IPeer, values []reflect.Value) []reflect.Value) {
 
 	rpcRegister.cache.Store(name, method)
 }
 
-func (rpcRegister *rpcRegister) Remove(name string) {
+func (rpcRegister *RpcRegister) Remove(name string) {
 	rpcRegister.cache.Delete(name)
 }
 
-func (rpcRegister *rpcRegister) GetRpcByName(name string) func(peer peer.IPeer, values []reflect.Value) []reflect.Value {
+func (rpcRegister *RpcRegister) GetRpcByName(name string) func(peer peer.IPeer, values []reflect.Value) []reflect.Value {
 	value, ok := rpcRegister.cache.Load(name)
 	if ok {
 		return value.(func(peer peer.IPeer, values []reflect.Value) []reflect.Value)
