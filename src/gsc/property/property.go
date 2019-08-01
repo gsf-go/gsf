@@ -6,14 +6,6 @@ import (
 	"sync"
 )
 
-type ISetter interface {
-	SetValue(name string, value interface{})
-}
-
-type IGetter interface {
-	GetValue(name string) interface{}
-}
-
 type Property struct {
 	fields *sync.Map
 	record *sync.Map
