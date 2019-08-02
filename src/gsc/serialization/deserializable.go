@@ -7,6 +7,7 @@ import (
 
 type IDeserializable interface {
 	Deserialize(args ...interface{}) []reflect.Value
+	DeserializeSingle(args ...interface{}) reflect.Value
 }
 
 type Deserializable struct {
@@ -25,37 +26,36 @@ func (deserializable *Deserializable) Deserialize(args ...interface{}) []reflect
 	objects := make([]reflect.Value, length)
 
 	for i := uint8(0); i < length; i++ {
-		value := deserializable.DeserializeSingle(deserializable.byteReader, args...)
+		value := deserializable.DeserializeSingle(args...)
 		objects[i] = value
 	}
 
 	return objects
 }
 
-func (deserializable *Deserializable) DeserializeSingle(byteReader *bytestream.ByteReader,
-	args ...interface{}) reflect.Value {
+func (deserializable *Deserializable) DeserializeSingle(args ...interface{}) reflect.Value {
 
 	// 反序列值类型
-	if data := deserializable.deserializeValue(byteReader); data != reflect.ValueOf(nil) {
+	if data := deserializable.deserializeValue(deserializable.byteReader); data != reflect.ValueOf(nil) {
 		return data
 	}
 
 	// 反序列化引用类型
-	if data := deserializable.deserializeRef(byteReader); data != reflect.ValueOf(nil) {
+	if data := deserializable.deserializeRef(deserializable.byteReader); data != reflect.ValueOf(nil) {
 		return data
 	}
 
 	// 反序列化切片类型
-	if data := deserializable.deserializeSlice(byteReader); data != reflect.ValueOf(nil) {
+	if data := deserializable.deserializeSlice(deserializable.byteReader); data != reflect.ValueOf(nil) {
 		return data
 	}
 
 	// 反序列化映射类型
-	if data := deserializable.deserializeMap(byteReader); data != reflect.ValueOf(nil) {
+	if data := deserializable.deserializeMap(deserializable.byteReader); data != reflect.ValueOf(nil) {
 		return data
 	}
 
-	if data := deserializable.deserializeStruct(byteReader, args...); data != reflect.ValueOf(nil) {
+	if data := deserializable.deserializeStruct(deserializable.byteReader, args...); data != reflect.ValueOf(nil) {
 		return data
 	}
 	return reflect.ValueOf(nil)

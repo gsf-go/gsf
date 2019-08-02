@@ -11,10 +11,10 @@ import (
 type ServerSocket struct {
 	*Event
 
-	server      server.IServer
-	objectPool  *pool.ObjectPool
-	stop        func()
-	dispatchers map[string]dispatcher.IDispatcher
+	server     server.IServer
+	objectPool *pool.ObjectPool
+	stop       func()
+	dispatcher dispatcher.IDispatcher
 }
 
 func NewServerSocket(dispatcher dispatcher.IDispatcher) *ServerSocket {

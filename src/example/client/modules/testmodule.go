@@ -7,6 +7,7 @@ import (
 	"github.com/sf-go/gsf/src/gsc/logger"
 	"github.com/sf-go/gsf/src/gsc/serialization"
 	"github.com/sf-go/gsf/src/gsf/service"
+	"github.com/sf-go/gsf/src/gsm/dispatcher"
 	"github.com/sf-go/gsf/src/gsm/module"
 	"github.com/sf-go/gsf/src/gsm/peer"
 	"strconv"
@@ -14,6 +15,7 @@ import (
 
 type TestClientModule struct {
 	*module.Module
+	dispatcher dispatcher.IDispatcher
 }
 
 func NewTestClientModule() *TestClientModule {
@@ -25,22 +27,22 @@ func NewTestClientModule() *TestClientModule {
 func (testModule *TestClientModule) Initialize(service service.IService) {
 	testModule.Module.Initialize(service)
 
-	testModule.AddController(controllers.NewTestController())
-	testModule.AddModel("TestModel", func(args ...interface{}) serialization.ISerializablePacket {
+	testModule.dispatcher = service.GetDispatcher()
+	testModule.AddController(controllers.NewTestController(testModule.dispatcher))
+	testModule.AddModel("TestModel", func(name string, args ...interface{}) serialization.ISerializablePacket {
 		return models.NewTestModel()
 	})
 	logger.Log.Debug("Initialize")
 }
 
 func (testModule *TestClientModule) Connected(peer peer.IPeer) {
-	controller := controllers.NewTestController()
 
 	component := components.NewUserComponent()
 	component.SetValue("Account", "account")
 	component.SetValue("Password", "123456")
 	peer.AddComponent(component)
 
-	result := controller.Invoke("Test", peer, func() []interface{} {
+	result := testModule.dispatcher.Invoke([]byte("Test"), peer, func() []interface{} {
 		return []interface{}{
 			10000,
 			&models.TestModel{
@@ -52,7 +54,7 @@ func (testModule *TestClientModule) Connected(peer peer.IPeer) {
 
 	logger.Log.Debug(strconv.Itoa(result[0].(int)))
 
-	controller.AsyncInvoke("Test", peer, func() []interface{} {
+	testModule.dispatcher.AsyncInvoke([]byte("Test"), peer, func() []interface{} {
 		return []interface{}{
 			10000,
 			&models.TestModel{

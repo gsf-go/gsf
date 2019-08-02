@@ -7,6 +7,7 @@ import (
 
 type ISerializable interface {
 	Serialize(args ...interface{}) []byte
+	SerializeSingle(obj interface{}) []byte
 }
 
 type Serializable struct {
@@ -56,6 +57,36 @@ func (serializable *Serializable) Serialize(args ...interface{}) []byte {
 	}
 
 	return buffer
+}
+
+func (serializable *Serializable) SerializeSingle(obj interface{}) []byte {
+
+	bytes := serializable.serializeValue(obj)
+	if bytes != nil {
+		return bytes
+	}
+
+	bytes = serializable.serializeRef(obj)
+	if bytes != nil {
+		return bytes
+	}
+
+	bytes = serializable.serializeSlice(obj)
+	if bytes != nil {
+		return bytes
+	}
+
+	bytes = serializable.serializeMap(obj)
+	if bytes != nil {
+		return bytes
+	}
+
+	bytes = serializable.serializeStruct(obj)
+	if bytes != nil {
+		return bytes
+	}
+
+	return bytes
 }
 
 func (serializable *Serializable) serializeValue(value interface{}) []byte {

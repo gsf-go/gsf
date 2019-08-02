@@ -4,11 +4,13 @@ import (
 	"github.com/sf-go/gsf/src/gsc/serialization"
 	"github.com/sf-go/gsf/src/gsf/service"
 	"github.com/sf-go/gsf/src/gsm/controller"
+	"github.com/sf-go/gsf/src/gsm/dispatcher"
 	"github.com/sf-go/gsf/src/gsm/peer"
 )
 
 type Module struct {
 	controllers []controller.IController
+	dispatcher  dispatcher.IDispatcher
 }
 
 func NewModule() *Module {

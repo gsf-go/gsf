@@ -4,43 +4,49 @@ import (
 	"github.com/sf-go/gsf/src/example/server/components"
 	"github.com/sf-go/gsf/src/example/server/models"
 	"github.com/sf-go/gsf/src/gsc/logger"
-	"github.com/sf-go/gsf/src/gsm/controller"
+	"github.com/sf-go/gsf/src/gsm/dispatcher"
 	"github.com/sf-go/gsf/src/gsm/peer"
 )
 
 type TestController struct {
-	*controller.Controller
+	dispatcher dispatcher.IDispatcher
 }
 
-func NewTestController() *TestController {
-	return &TestController{
-		Controller: controller.NewController(),
+func (testController *TestController) GetName() string {
+	return "TestController"
+}
+
+func NewTestController(dispatcher dispatcher.IDispatcher) *TestController {
+	controller := &TestController{
+		dispatcher: dispatcher,
 	}
+	controller.Initialize()
+	return controller
 }
 
 func (testController *TestController) Initialize() {
-	testController.Controller.Initialize()
+	testController.dispatcher.Register([]byte("Test"),
+		func() interface{} {
+			return func(num int, testmodel *models.TestModel, peer peer.IPeer) bool {
+				logger.Log.Debug("xxxxxxxxxxxxxxxxxxxx")
+				return true
+			}
+		},
+		func() interface{} {
+			return testController.Test
+		}, func() interface{} {
+			return func(num int, testmodel *models.TestModel, peer peer.IPeer) {
+				logger.Log.Debug("oooooooooooooooooooo")
+			}
+		})
 
-	testController.Register([]byte("Test"), func() interface{} {
-		return testController.Test
-	}, func() interface{} {
-		return func(num int, testmodel *models.TestModel, peer peer.IPeer) bool {
-			logger.Log.Debug("xxxxxxxxxxxxxxxxxxxx")
-			return true
-		}
-	}, func() interface{} {
-		return func(num int, testmodel *models.TestModel, peer peer.IPeer) {
-			logger.Log.Debug("oooooooooooooooooooo")
-		}
-	})
-
-	testController.Register([]byte("Test2"), func() interface{} {
+	testController.dispatcher.Register([]byte("Test2"), func() interface{} {
 		return testController.Test2
 	}, nil, nil)
 }
 
-func (testController *TestController) Test2(num int32, peer peer.IPeer) int32 {
-	return num + 10000
+func (testController *TestController) Test2(num int32, peer peer.IPeer) bool {
+	return true
 }
 
 func (testController *TestController) Test(num int, testmodel *models.TestModel, peer peer.IPeer) int {

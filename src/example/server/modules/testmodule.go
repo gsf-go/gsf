@@ -24,7 +24,7 @@ func NewTestServerModule() *TestServerModule {
 func (testModule *TestServerModule) Initialize(service service.IService) {
 	testModule.Module.Initialize(service)
 
-	testModule.AddController(controllers.NewTestController())
+	testModule.AddController(controllers.NewTestController(service.GetDispatcher()))
 	testModule.AddModel("TestModel", func(name string, args ...interface{}) serialization.ISerializablePacket {
 		return models.NewTestModel()
 	})

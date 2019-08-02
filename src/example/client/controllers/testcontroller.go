@@ -1,19 +1,19 @@
 package controllers
 
 import (
-	"github.com/sf-go/gsf/src/gsm/controller"
+	"github.com/sf-go/gsf/src/gsm/dispatcher"
 )
 
 type TestController struct {
-	*controller.Controller
+	dispatcher dispatcher.IDispatcher
 }
 
-func NewTestController() *TestController {
+func (controller *TestController) GetName() string {
+	return "TestController"
+}
+
+func NewTestController(dispatcher dispatcher.IDispatcher) *TestController {
 	return &TestController{
-		Controller: controller.NewController(),
+		dispatcher: dispatcher,
 	}
-}
-
-func (testController *TestController) Initialize() {
-	testController.Controller.Initialize()
 }

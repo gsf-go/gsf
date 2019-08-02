@@ -29,7 +29,7 @@ func (byteReader *ByteReader) Shift(offset int64) {
 	}
 }
 
-func (byteReader *ByteReader) GetPosition() int {
+func (byteReader *ByteReader) GetUnreadLength() int {
 	return byteReader.reader.Len()
 }
 

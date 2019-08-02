@@ -32,7 +32,7 @@ func (handle *Handle) ReadHandle(
 
 		if total <= packet.Offset {
 			if handleCallback != nil {
-				handleCallback(packet.Connection, packet.Buffer[verifyLength:])
+				handleCallback(packet.Connection, packet.Buffer[verifyLength:total])
 			}
 
 			copy(packet.Buffer[0:packet.Offset-total], packet.Buffer[total:packet.Offset])

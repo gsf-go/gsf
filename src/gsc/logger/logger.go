@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"fmt"
 	"log"
 	"os"
 )
@@ -11,27 +12,6 @@ type Logger struct {
 	warning *log.Logger
 	error   *log.Logger
 	fatal   *log.Logger
-
-	logChan chan func()
-}
-
-func (logger *Logger) SetConfig(config *LogConfig) {
-	logger.logChan = make(chan func(), config.Capacity)
-
-	go func() {
-		for {
-			select {
-			case l, ok := <-logger.logChan:
-				if !ok {
-					return
-				}
-
-				if l != nil {
-					l()
-				}
-			}
-		}
-	}()
 }
 
 var Log *Logger
@@ -53,41 +33,32 @@ func init() {
 }
 
 func NewLogger() *Logger {
-	return &Logger{
+	logger := &Logger{
 		debug:   log.New(os.Stdout, CLR_0, log.Ldate|log.Ltime|log.Lmicroseconds|log.Lshortfile),
 		info:    log.New(os.Stdout, CLR_G, log.Ldate|log.Ltime|log.Lmicroseconds|log.Lshortfile),
 		warning: log.New(os.Stdout, CLR_Y, log.Ldate|log.Ltime|log.Lmicroseconds|log.Lshortfile),
 		error:   log.New(os.Stdout, CLR_R, log.Ldate|log.Ltime|log.Lmicroseconds|log.Lshortfile),
 		fatal:   log.New(os.Stdout, CLR_C, log.Ldate|log.Ltime|log.Lmicroseconds|log.Lshortfile),
 	}
+	return logger
 }
 
 func (logger *Logger) Debug(format string, args ...interface{}) {
-	logger.logChan <- func() {
-		logger.debug.Printf("DEBUG: "+format, args...)
-	}
+	_ = logger.debug.Output(2, fmt.Sprintf("DEBUG:  "+format, args...))
 }
 
 func (logger *Logger) Info(format string, args ...interface{}) {
-	logger.logChan <- func() {
-		logger.info.Printf("INFO:  "+format, args...)
-	}
+	_ = logger.info.Output(2, fmt.Sprintf("INFO:  "+format, args...))
 }
 
 func (logger *Logger) Warning(format string, args ...interface{}) {
-	logger.logChan <- func() {
-		logger.warning.Printf("WARN:  "+format, args...)
-	}
+	_ = logger.warning.Output(2, fmt.Sprintf("WARN:  "+format, args...))
 }
 
 func (logger *Logger) Error(format string, args ...interface{}) {
-	logger.logChan <- func() {
-		logger.error.Printf("ERROR: "+format, args...)
-	}
+	_ = logger.error.Output(2, fmt.Sprintf("ERROR:  "+format, args...))
 }
 
 func (logger *Logger) Fatal(format string, args ...interface{}) {
-	logger.logChan <- func() {
-		logger.fatal.Printf("FATAL: "+format, args...)
-	}
+	_ = logger.fatal.Output(2, fmt.Sprintf("FATAL:  "+format, args...))
 }

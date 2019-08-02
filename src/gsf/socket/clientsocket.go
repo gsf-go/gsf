@@ -40,7 +40,7 @@ func (clientSocket *ClientSocket) addListener(
 			return
 		}
 
-		clientSocket.dispatcher.Invoke(p, data)
+		clientSocket.dispatcher.Dispatch(p, data)
 	}
 
 	client.OnError = func(connection network.IConnection, err error) {

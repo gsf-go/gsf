@@ -4,8 +4,10 @@ import (
 	"github.com/sf-go/gsf/src/gsc/crypto"
 	"github.com/sf-go/gsf/src/gsc/logger"
 	"github.com/sf-go/gsf/src/gsc/network"
+	"github.com/sf-go/gsf/src/gsc/rpc"
 	"github.com/sf-go/gsf/src/gsf/service"
 	"github.com/sf-go/gsf/src/gsf/socket"
+	"github.com/sf-go/gsf/src/gsm/dispatcher"
 	"github.com/sf-go/gsf/src/gsm/module"
 	"github.com/sf-go/gsf/src/gsm/peer"
 	"os"
@@ -26,16 +28,17 @@ func RunServer(application IApplication, args []string) {
 	logConfig := logger.NewLogConfig()
 
 	application.SetLogConfig(logConfig)
-	logger.Log.SetConfig(logConfig)
 	application.SetNetConfig(netConfig)
 	application.SetCryptoConfig(crypto.NewCryptoConfig())
 	application.RegisterModule(moduleManager)
 
-	serverSocket := socket.NewServerSocket()
-	s := service.NewServerService(serverSocket)
-	moduleInitialize(s, moduleManager)
+	rpcRegister := rpc.NewRpcRegister()
+	dispatcher := dispatcher.NewDispatcher(rpcRegister)
+	serverSocket := socket.NewServerSocket(dispatcher)
+	serverService := service.NewServerService(dispatcher, serverSocket)
+	moduleInitialize(serverService, moduleManager)
 	moduleConnectInitialize(serverSocket.Event, moduleManager)
-	s.StartServer(netConfig)
+	serverService.StartServer(netConfig)
 }
 
 func RunClient(application IApplication, args []string) {
@@ -44,16 +47,17 @@ func RunClient(application IApplication, args []string) {
 	logConfig := logger.NewLogConfig()
 
 	application.SetLogConfig(logConfig)
-	logger.Log.SetConfig(logConfig)
 	application.SetNetConfig(netConfig)
 	application.SetCryptoConfig(crypto.NewCryptoConfig())
 	application.RegisterModule(moduleManager)
 
-	clientSocket := socket.NewClientSocket()
-	s := service.NewClientService(clientSocket)
-	moduleInitialize(s, moduleManager)
+	rpcRegister := rpc.NewRpcRegister()
+	dispatcher := dispatcher.NewDispatcher(rpcRegister)
+	clientSocket := socket.NewClientSocket(dispatcher)
+	clientService := service.NewClientService(clientSocket, dispatcher)
+	moduleInitialize(clientService, moduleManager)
 	moduleConnectInitialize(clientSocket.Event, moduleManager)
-	s.Connect(netConfig)
+	clientService.Connect(netConfig)
 }
 
 func shutdown(callback func()) {
