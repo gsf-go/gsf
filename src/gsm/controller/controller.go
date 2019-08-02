@@ -52,31 +52,30 @@ func (controller *Controller) Register(
 		afterValue = reflect.ValueOf(after())
 	}
 
-	rpcRegister.Add(name,
-		func(p peer.IPeer, values []reflect.Value) []reflect.Value {
+	rpcRegister.Add(name, func(p peer.IPeer, values []reflect.Value) []reflect.Value {
 
-			if index > 0 {
-				values = append(values, make([]reflect.Value, 1)...)
-				values = append(values[:index], values[index:]...)
-				values[index] = reflect.ValueOf(p)
-			}
+		if index > 0 {
+			values = append(values, make([]reflect.Value, 1)...)
+			values = append(values[:index], values[index:]...)
+			values[index] = reflect.ValueOf(p)
+		}
 
-			args := values[:argsLength]
+		args := values[:argsLength]
 
-			if beforeValue != reflect.ValueOf(nil) {
-				beforeRet := beforeValue.Call(args)
-				if beforeRet[0].Bool() {
-					ret := method.Call(args)
-					if afterValue != reflect.ValueOf(nil) {
-						afterValue.Call(args)
-					}
-					return ret
+		if beforeValue != reflect.ValueOf(nil) {
+			beforeRet := beforeValue.Call(args)
+			if beforeRet[0].Bool() {
+				ret := method.Call(args)
+				if afterValue != reflect.ValueOf(nil) {
+					afterValue.Call(args)
 				}
-				return nil
+				return ret
 			}
-			ret := method.Call(args)
-			return ret
-		})
+			return nil
+		}
+		ret := method.Call(args)
+		return ret
+	})
 }
 
 func (controller *Controller) Invoke(

@@ -13,7 +13,7 @@ func Func(num int, str string) string {
 
 func TestRpc(t *testing.T) {
 	method := reflect.ValueOf(Func)
-	GetRpcRegisterInstance().Add("Func",
+	RpcRegisterInstance.Add("Func",
 		func(peer peer.IPeer, args []reflect.Value) []reflect.Value {
 			return method.Call(args)
 		})
@@ -24,7 +24,7 @@ func TestRpc(t *testing.T) {
 
 func TestRpc2(t *testing.T) {
 	method := reflect.ValueOf(Func)
-	GetRpcRegisterInstance().Add("Func",
+	RpcRegisterInstance.Add("Func",
 		func(peer peer.IPeer, args []reflect.Value) []reflect.Value {
 			return method.Call(args)
 		})
