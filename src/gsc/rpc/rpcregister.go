@@ -1,14 +1,12 @@
 package rpc
 
 import (
-	"github.com/sf-go/gsf/src/gsf/peer"
+	"github.com/sf-go/gsf/src/gsm/peer"
 	"reflect"
 	"sync"
 )
 
 //go:generate ../../../gen/Singleton.exe -struct=rpcRegister -out=./rpcregister.go
-
-var RpcRegisterInstance = NewRpcRegister()
 
 type RpcRegister struct {
 	cache *sync.Map
@@ -20,14 +18,26 @@ func NewRpcRegister() *RpcRegister {
 	}
 }
 
-func (rpcRegister *RpcRegister) Add(name string,
+func (rpcRegister *RpcRegister) AddRequest(id []byte,
 	method func(peer peer.IPeer, values []reflect.Value) []reflect.Value) {
-
-	rpcRegister.cache.Store(name, method)
+	rpcRegister.cache.Store(string(id), method)
 }
 
-func (rpcRegister *RpcRegister) Remove(name string) {
-	rpcRegister.cache.Delete(name)
+func (rpcRegister *RpcRegister) AddResponse(id []byte,
+	method func(peer peer.IPeer, values []reflect.Value) []reflect.Value) {
+
+	tmp := make([]byte, len(id)+1)
+	tmp = append(tmp, 1)
+	tmp = append(tmp, id...)
+
+	rpcRegister.cache.Store(string(tmp), method)
+}
+
+func (rpcRegister *RpcRegister) RemoveResponse(id []byte) {
+	tmp := make([]byte, len(id)+1)
+	tmp = append(tmp, 1)
+	tmp = append(tmp, id...)
+	rpcRegister.cache.Delete(string(tmp))
 }
 
 func (rpcRegister *RpcRegister) GetRpcByName(name string) func(peer peer.IPeer, values []reflect.Value) []reflect.Value {

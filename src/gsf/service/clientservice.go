@@ -2,8 +2,8 @@ package service
 
 import (
 	"github.com/sf-go/gsf/src/gsc/network"
-	"github.com/sf-go/gsf/src/gsf/peer"
 	"github.com/sf-go/gsf/src/gsf/socket"
+	"github.com/sf-go/gsf/src/gsm/peer"
 	"sync"
 )
 

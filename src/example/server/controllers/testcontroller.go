@@ -4,8 +4,8 @@ import (
 	"github.com/sf-go/gsf/src/example/server/components"
 	"github.com/sf-go/gsf/src/example/server/models"
 	"github.com/sf-go/gsf/src/gsc/logger"
-	"github.com/sf-go/gsf/src/gsf/peer"
 	"github.com/sf-go/gsf/src/gsm/controller"
+	"github.com/sf-go/gsf/src/gsm/peer"
 )
 
 type TestController struct {
@@ -21,7 +21,7 @@ func NewTestController() *TestController {
 func (testController *TestController) Initialize() {
 	testController.Controller.Initialize()
 
-	testController.Register("Test", func() interface{} {
+	testController.Register([]byte("Test"), func() interface{} {
 		return testController.Test
 	}, func() interface{} {
 		return func(num int, testmodel *models.TestModel, peer peer.IPeer) bool {
@@ -34,7 +34,7 @@ func (testController *TestController) Initialize() {
 		}
 	})
 
-	testController.Register("Test2", func() interface{} {
+	testController.Register([]byte("Test2"), func() interface{} {
 		return testController.Test2
 	}, nil, nil)
 }

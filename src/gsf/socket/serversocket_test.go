@@ -3,7 +3,7 @@ package socket
 import (
 	"github.com/sf-go/gsf/src/gsc/network"
 	"github.com/sf-go/gsf/src/gsc/rpc"
-	"github.com/sf-go/gsf/src/gsf/peer"
+	"github.com/sf-go/gsf/src/gsm/peer"
 	"reflect"
 	"strconv"
 	"testing"
@@ -17,7 +17,7 @@ func TestServerSocket(t *testing.T) {
 	config.Port = 5678
 	config.ConnectTimeout = 3
 
-	rpc.GetRpcRegisterInstance().Add("Func",
+	rpc.RpcRegisterInstance.Add("Func",
 		func(peer peer.IPeer, args []reflect.Value) []reflect.Value {
 			Func := func(num int, str string) string {
 				return strconv.Itoa(num) + " " + str
@@ -36,7 +36,7 @@ func TestServerSocket(t *testing.T) {
 		connection.Send(ret)
 	}
 
-	rpc.GetRpcRegisterInstance().Add("#Func", func(peer peer.IPeer, values []reflect.Value) []reflect.Value {
+	rpc.RpcRegisterInstance.Add("#Func", func(peer peer.IPeer, values []reflect.Value) []reflect.Value {
 		Func := func(str string) {
 			t.Log(str)
 		}

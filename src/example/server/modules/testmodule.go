@@ -6,9 +6,9 @@ import (
 	"github.com/sf-go/gsf/src/example/server/models"
 	"github.com/sf-go/gsf/src/gsc/logger"
 	"github.com/sf-go/gsf/src/gsc/serialization"
-	"github.com/sf-go/gsf/src/gsf/peer"
 	"github.com/sf-go/gsf/src/gsf/service"
 	"github.com/sf-go/gsf/src/gsm/module"
+	"github.com/sf-go/gsf/src/gsm/peer"
 )
 
 type TestServerModule struct {
@@ -25,12 +25,11 @@ func (testModule *TestServerModule) Initialize(service service.IService) {
 	testModule.Module.Initialize(service)
 
 	testModule.AddController(controllers.NewTestController())
-	testModule.AddModel("TestModel", func(args ...interface{}) serialization.ISerializablePacket {
+	testModule.AddModel("TestModel", func(name string, args ...interface{}) serialization.ISerializablePacket {
 		return models.NewTestModel()
 	})
 
-	testModule.AddModel("UserComponent", func(args ...interface{}) serialization.ISerializablePacket {
-		name := args[0].(string)
+	testModule.AddModel("UserComponent", func(name string, args ...interface{}) serialization.ISerializablePacket {
 		p := args[1].(peer.IPeer)
 		return p.GetComponent(name).(serialization.ISerializablePacket)
 	})

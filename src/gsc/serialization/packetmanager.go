@@ -18,14 +18,14 @@ func NewPacketManager() *PacketManager {
 	}
 }
 
-func (packetManager *PacketManager) AddPacket(name string, generate func(args ...interface{}) ISerializablePacket) {
+func (packetManager *PacketManager) AddPacket(name string, generate func(name string, args ...interface{}) ISerializablePacket) {
 	packetManager.packets.Store(name, generate)
 }
 
-func (packetManager *PacketManager) GetPacket(name string) func(args ...interface{}) ISerializablePacket {
+func (packetManager *PacketManager) GetPacket(name string) func(name string, args ...interface{}) ISerializablePacket {
 	v, ok := packetManager.packets.Load(name)
 	if ok {
-		return v.(func(...interface{}) ISerializablePacket)
+		return v.(func(string, ...interface{}) ISerializablePacket)
 	}
 	return nil
 }

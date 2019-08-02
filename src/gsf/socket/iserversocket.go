@@ -2,7 +2,7 @@ package socket
 
 import (
 	"github.com/sf-go/gsf/src/gsc/network"
-	"github.com/sf-go/gsf/src/gsf/peer"
+	"github.com/sf-go/gsf/src/gsm/peer"
 )
 
 type Event struct {

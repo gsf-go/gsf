@@ -1,7 +1,7 @@
 package rpc
 
 import (
-	"github.com/sf-go/gsf/src/gsf/peer"
+	"github.com/sf-go/gsf/src/gsm/peer"
 	"reflect"
 	"strconv"
 	"testing"
@@ -18,7 +18,7 @@ func TestRpc(t *testing.T) {
 			return method.Call(args)
 		})
 	req := NewRpcInvoke()
-	ret := req.Invoke("Func", nil, 100, "xxxxx")
+	ret := req.Invoke([]byte("Func"), nil, 100, "xxxxx")
 	t.Log(ret)
 }
 
@@ -29,7 +29,7 @@ func TestRpc2(t *testing.T) {
 			return method.Call(args)
 		})
 	request := NewRpcInvoke()
-	ret := request.Request("Func", 100, "xxxxx")
+	ret := request.Request([]byte("Func"), 100, "xxxxx")
 
 	response := NewRpcResponse()
 	res, _ := response.Response(ret)

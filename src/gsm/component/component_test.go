@@ -4,7 +4,7 @@ import (
 	"github.com/sf-go/gsf/src/gsc/bytestream"
 	"github.com/sf-go/gsf/src/gsc/property"
 	"github.com/sf-go/gsf/src/gsc/serialization"
-	"github.com/sf-go/gsf/src/gsf/peer"
+	"github.com/sf-go/gsf/src/gsm/peer"
 	"reflect"
 	"testing"
 )

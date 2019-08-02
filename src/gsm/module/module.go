@@ -2,9 +2,9 @@ package module
 
 import (
 	"github.com/sf-go/gsf/src/gsc/serialization"
-	"github.com/sf-go/gsf/src/gsf/peer"
 	"github.com/sf-go/gsf/src/gsf/service"
 	"github.com/sf-go/gsf/src/gsm/controller"
+	"github.com/sf-go/gsf/src/gsm/peer"
 )
 
 type Module struct {
@@ -19,10 +19,9 @@ func NewModule() *Module {
 
 func (module *Module) AddController(controller controller.IController) {
 	module.controllers = append(module.controllers, controller)
-	controller.Initialize()
 }
 
-func (module *Module) AddModel(name string, generate func(args ...interface{}) serialization.ISerializablePacket) {
+func (module *Module) AddModel(name string, generate func(name string, args ...interface{}) serialization.ISerializablePacket) {
 	serialization.PacketManagerInstance.AddPacket(name, generate)
 }
 

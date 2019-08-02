@@ -4,24 +4,27 @@ import (
 	"github.com/sf-go/gsf/src/gsc/network"
 	"github.com/sf-go/gsf/src/gsc/network/server"
 	"github.com/sf-go/gsf/src/gsc/pool"
-	"github.com/sf-go/gsf/src/gsf/peer"
+	"github.com/sf-go/gsf/src/gsm/dispatcher"
+	"github.com/sf-go/gsf/src/gsm/peer"
 )
 
 type ServerSocket struct {
 	*Event
 
-	server     server.IServer
-	objectPool *pool.ObjectPool
-	stop       func()
+	server      server.IServer
+	objectPool  *pool.ObjectPool
+	stop        func()
+	dispatchers map[string]dispatcher.IDispatcher
 }
 
-func NewServerSocket() *ServerSocket {
+func NewServerSocket(dispatcher dispatcher.IDispatcher) *ServerSocket {
 	return &ServerSocket{
 		server: server.NewTcpServer(network.NewHandle()),
 		objectPool: pool.NewObjectPool(func() interface{} {
 			return peer.NewPeer()
 		}),
-		Event: NewEvent(),
+		Event:      NewEvent(),
+		dispatcher: dispatcher,
 	}
 }
 
@@ -38,8 +41,7 @@ func (serverSocket *ServerSocket) addListener(
 			return
 		}
 
-		invoker := NewInvoker()
-		invoker.Invoke(p, data)
+		serverSocket.dispatcher.Dispatch(p, data)
 	}
 
 	server.OnError = func(connection network.IConnection, err error) {

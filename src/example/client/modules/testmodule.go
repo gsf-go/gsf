@@ -6,9 +6,9 @@ import (
 	"github.com/sf-go/gsf/src/example/client/models"
 	"github.com/sf-go/gsf/src/gsc/logger"
 	"github.com/sf-go/gsf/src/gsc/serialization"
-	"github.com/sf-go/gsf/src/gsf/peer"
 	"github.com/sf-go/gsf/src/gsf/service"
 	"github.com/sf-go/gsf/src/gsm/module"
+	"github.com/sf-go/gsf/src/gsm/peer"
 	"strconv"
 )
 
