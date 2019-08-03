@@ -25,7 +25,7 @@ func NewTestController(dispatcher dispatcher.IDispatcher) *TestController {
 }
 
 func (testController *TestController) Initialize() {
-	testController.dispatcher.Register([]byte("Test"),
+	testController.dispatcher.Register("Test",
 		func() interface{} {
 			return func(num int, testmodel *models.TestModel, peer peer.IPeer) bool {
 				logger.Log.Debug("xxxxxxxxxxxxxxxxxxxx")
@@ -40,9 +40,16 @@ func (testController *TestController) Initialize() {
 			}
 		})
 
-	testController.dispatcher.Register([]byte("Test2"), func() interface{} {
+	testController.dispatcher.Register("Test2", nil, func() interface{} {
 		return testController.Test2
-	}, nil, nil)
+	}, nil)
+
+	testController.dispatcher.RawRegister("Test3", nil, testController.Test3, nil)
+}
+
+func (testController *TestController) Test3(p peer.IPeer, data []byte) []byte {
+	logger.Log.Info(string(data))
+	return []byte("Hello!")
 }
 
 func (testController *TestController) Test2(num int32, peer peer.IPeer) bool {

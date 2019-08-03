@@ -10,7 +10,6 @@ import (
 	"github.com/sf-go/gsf/src/gsm/dispatcher"
 	"github.com/sf-go/gsf/src/gsm/module"
 	"github.com/sf-go/gsf/src/gsm/peer"
-	"strconv"
 )
 
 type TestClientModule struct {
@@ -42,28 +41,32 @@ func (testModule *TestClientModule) Connected(peer peer.IPeer) {
 	component.SetValue("Password", "123456")
 	peer.AddComponent(component)
 
-	result := testModule.dispatcher.Invoke([]byte("Test"), peer, func() []interface{} {
-		return []interface{}{
-			10000,
-			&models.TestModel{
-				Name: "wwj",
-				Age:  500,
-			},
-		}
-	})
+	//result := testModule.dispatcher.Invoke("Test", peer, func() []interface{} {
+	//	return []interface{}{
+	//		10000,
+	//		&models.TestModel{
+	//			Name: "wwj",
+	//			Age:  500,
+	//		},
+	//	}
+	//})
+	//
+	//logger.Log.Debug(strconv.Itoa(result[0].(int)))
+	//
+	//testModule.dispatcher.AsyncInvoke("Test", peer, func() []interface{} {
+	//	return []interface{}{
+	//		10000,
+	//		&models.TestModel{
+	//			Name: "wwj",
+	//			Age:  500,
+	//		},
+	//	}
+	//}, func(result []interface{}) {
+	//	logger.Log.Debug(strconv.Itoa(result[0].(int)))
+	//})
 
-	logger.Log.Debug(strconv.Itoa(result[0].(int)))
-
-	testModule.dispatcher.AsyncInvoke([]byte("Test"), peer, func() []interface{} {
-		return []interface{}{
-			10000,
-			&models.TestModel{
-				Name: "wwj",
-				Age:  500,
-			},
-		}
-	}, func(result []interface{}) {
-		logger.Log.Debug(strconv.Itoa(result[0].(int)))
+	testModule.dispatcher.AsyncRawInvoke("Test3", peer, []byte("11111"), func(result []byte) {
+		logger.Log.Debug(string(result))
 	})
 }
 

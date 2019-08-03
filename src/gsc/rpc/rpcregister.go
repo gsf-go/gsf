@@ -25,22 +25,22 @@ func (rpcRegister *RpcRegister) AddRequest(id []byte,
 func (rpcRegister *RpcRegister) AddResponse(id []byte,
 	method func(peer peer.IPeer, messageId []byte, data []byte)) {
 
-	tmp := make([]byte, len(id)+1)
-	tmp = append(tmp, 1)
-	tmp = append(tmp, id...)
+	id = append(id, 1)
+	rpcRegister.cache.Store(string(id), method)
+}
 
-	rpcRegister.cache.Store(string(tmp), method)
+func (rpcRegister *RpcRegister) GetResponseId(id []byte) []byte {
+	id = append(id, 1)
+	return id
 }
 
 func (rpcRegister *RpcRegister) RemoveResponse(id []byte) {
-	tmp := make([]byte, len(id)+1)
-	tmp = append(tmp, 1)
-	tmp = append(tmp, id...)
-	rpcRegister.cache.Delete(string(tmp))
+	id = append(id, 1)
+	rpcRegister.cache.Delete(string(id))
 }
 
-func (rpcRegister *RpcRegister) GetRpcByName(name string) func(peer peer.IPeer, messageId []byte, data []byte) {
-	value, ok := rpcRegister.cache.Load(name)
+func (rpcRegister *RpcRegister) GetRpcByName(id []byte) func(peer peer.IPeer, messageId []byte, data []byte) {
+	value, ok := rpcRegister.cache.Load(string(id))
 	if ok {
 		return value.(func(peer peer.IPeer, messageId []byte, data []byte))
 	}
