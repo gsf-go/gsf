@@ -5,7 +5,7 @@ import (
 	"github.com/sf-go/gsf/src/gsc/crypto"
 	"github.com/sf-go/gsf/src/gsc/logger"
 	"github.com/sf-go/gsf/src/gsc/network"
-	"github.com/sf-go/gsf/src/gsm/module"
+	"github.com/sf-go/gsf/src/gsm"
 )
 
 type Application struct {
@@ -15,7 +15,7 @@ func NewApplication() *Application {
 	return &Application{}
 }
 
-func (application *Application) RegisterModule(moduleManager *module.ModuleManager) {
+func (application *Application) RegisterModule(moduleManager *gsm.ModuleManager) {
 	moduleManager.AddModule("TestServerModule", modules.NewTestServerModule())
 }
 

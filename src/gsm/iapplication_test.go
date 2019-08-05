@@ -49,7 +49,7 @@ func NewApplication() *Application {
 	return &Application{}
 }
 
-func (application *Application) RegisterModule(moduleManager *module.ModuleManager) {
+func (application *Application) RegisterModule(moduleManager *ModuleManager) {
 	moduleManager.AddModule("TestModule", NewTestModule())
 }
 

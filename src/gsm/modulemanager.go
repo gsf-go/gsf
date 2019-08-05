@@ -1,6 +1,7 @@
-package module
+package gsm
 
 import (
+	"github.com/sf-go/gsf/src/gsm/module"
 	"sync"
 )
 
@@ -14,7 +15,7 @@ func NewModuleManager() *ModuleManager {
 	}
 }
 
-func (moduleManager *ModuleManager) AddModule(name string, module IModule) {
+func (moduleManager *ModuleManager) AddModule(name string, module module.IModule) {
 	moduleManager.modules.Store(name, module)
 }
 
@@ -22,10 +23,10 @@ func (moduleManager *ModuleManager) RemoveModule(name string) {
 	moduleManager.modules.Delete(name)
 }
 
-func (moduleManager *ModuleManager) GetModule(name string) IModule {
+func (moduleManager *ModuleManager) GetModule(name string) module.IModule {
 	m, ok := moduleManager.modules.Load(name)
 	if ok {
-		return m.(IModule)
+		return m.(module.IModule)
 	}
 	return nil
 }

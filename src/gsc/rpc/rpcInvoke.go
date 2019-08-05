@@ -35,8 +35,8 @@ func NewRpcInvoke() *RpcInvoke {
 //}
 
 func (rpcInvoke *RpcInvoke) Request(methodId []byte, args ...interface{}) []byte {
-	dataBytes := rpcInvoke.serializable.Serialize(args...)
 	methodIdBytes := rpcInvoke.serializable.SerializeSingle(methodId)
+	dataBytes := rpcInvoke.serializable.Serialize(args...)
 	buffer := make([]byte, 0, len(methodIdBytes)+len(dataBytes))
 	buffer = append(buffer, methodIdBytes...)
 	buffer = append(buffer, dataBytes...)

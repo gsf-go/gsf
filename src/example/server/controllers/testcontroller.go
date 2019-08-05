@@ -1,22 +1,21 @@
 package controllers
 
 import (
-	"github.com/sf-go/gsf/src/example/server/components"
 	"github.com/sf-go/gsf/src/example/server/models"
 	"github.com/sf-go/gsf/src/gsc/logger"
-	"github.com/sf-go/gsf/src/gsm/dispatcher"
+	"github.com/sf-go/gsf/src/gsm/invoker"
 	"github.com/sf-go/gsf/src/gsm/peer"
 )
 
 type TestController struct {
-	dispatcher dispatcher.IDispatcher
+	dispatcher invoker.IInvoker
 }
 
 func (testController *TestController) GetName() string {
 	return "TestController"
 }
 
-func NewTestController(dispatcher dispatcher.IDispatcher) *TestController {
+func NewTestController(dispatcher invoker.IInvoker) *TestController {
 	controller := &TestController{
 		dispatcher: dispatcher,
 	}
@@ -57,11 +56,6 @@ func (testController *TestController) Test2(num int32, peer peer.IPeer) bool {
 }
 
 func (testController *TestController) Test(num int, testmodel *models.TestModel, peer peer.IPeer) int {
-	logger.Log.Debug(testmodel.Name)
-
-	cmpt := peer.GetComponent("UserComponent").(*components.UserComponent)
-	logger.Log.Debug(cmpt.Account)
-	logger.Log.Debug(cmpt.Password)
 	logger.Log.Debug(testmodel.Name)
 	return num + 10000
 }

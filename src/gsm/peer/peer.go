@@ -32,7 +32,7 @@ func (peer *Peer) SetConnection(connection network.IConnection) {
 }
 
 func (peer *Peer) AddComponent(component component.IComponent) {
-	peer.components.Store(component.GetName(), component)
+	peer.components.Store(component.GetObjectId(), component)
 }
 
 func (peer *Peer) GetComponent(componentName string) component.IComponent {

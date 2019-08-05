@@ -1,12 +1,11 @@
 package components
 
 import (
-	"github.com/sf-go/gsf/src/gsc/property"
-	"reflect"
+	"github.com/sf-go/gsf/src/gsm/component"
 )
 
 type UserComponent struct {
-	*property.Property
+	*component.Component
 
 	Account  string
 	Password string
@@ -14,13 +13,9 @@ type UserComponent struct {
 
 func NewUserComponent() *UserComponent {
 	userComponent := &UserComponent{
-		Property: property.NewProperty(),
+		Component: component.NewComponent(),
 	}
 
 	userComponent.Register(userComponent)
 	return userComponent
-}
-
-func (userComponent *UserComponent) GetName() string {
-	return reflect.TypeOf(userComponent).Elem().Name()
 }

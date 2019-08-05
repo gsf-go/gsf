@@ -7,7 +7,7 @@ import (
 	"github.com/sf-go/gsf/src/gsc/rpc"
 	"github.com/sf-go/gsf/src/gsf/service"
 	"github.com/sf-go/gsf/src/gsf/socket"
-	"github.com/sf-go/gsf/src/gsm/dispatcher"
+	"github.com/sf-go/gsf/src/gsm/invoker"
 	"github.com/sf-go/gsf/src/gsm/module"
 	"github.com/sf-go/gsf/src/gsm/peer"
 	"os"
@@ -16,14 +16,14 @@ import (
 )
 
 type IApplication interface {
-	RegisterModule(moduleManager *module.ModuleManager)
+	RegisterModule(moduleManager *ModuleManager)
 	SetLogConfig(config *logger.LogConfig)
 	SetNetConfig(config *network.NetConfig)
 	SetCryptoConfig(config *crypto.CryptoConfig)
 }
 
 func RunServer(application IApplication, args []string) {
-	moduleManager := module.NewModuleManager()
+	moduleManager := NewModuleManager()
 	netConfig := network.NewNetConfig()
 	logConfig := logger.NewLogConfig()
 
@@ -33,7 +33,7 @@ func RunServer(application IApplication, args []string) {
 	application.RegisterModule(moduleManager)
 
 	rpcRegister := rpc.NewRpcRegister()
-	dispatcher := dispatcher.NewDispatcher(rpcRegister)
+	dispatcher := invoker.NewInvoker(rpcRegister)
 	serverSocket := socket.NewServerSocket(dispatcher)
 	serverService := service.NewServerService(dispatcher, serverSocket)
 	moduleInitialize(serverService, moduleManager)
@@ -42,7 +42,7 @@ func RunServer(application IApplication, args []string) {
 }
 
 func RunClient(application IApplication, args []string) {
-	moduleManager := module.NewModuleManager()
+	moduleManager := NewModuleManager()
 	netConfig := network.NewNetConfig()
 	logConfig := logger.NewLogConfig()
 
@@ -52,7 +52,7 @@ func RunClient(application IApplication, args []string) {
 	application.RegisterModule(moduleManager)
 
 	rpcRegister := rpc.NewRpcRegister()
-	dispatcher := dispatcher.NewDispatcher(rpcRegister)
+	dispatcher := invoker.NewInvoker(rpcRegister)
 	clientSocket := socket.NewClientSocket(dispatcher)
 	clientService := service.NewClientService(clientSocket, dispatcher)
 	moduleInitialize(clientService, moduleManager)
@@ -73,7 +73,7 @@ func shutdown(callback func()) {
 	}()
 }
 
-func moduleConnectInitialize(event *socket.Event, moduleManager *module.ModuleManager) {
+func moduleConnectInitialize(event *socket.Event, moduleManager *ModuleManager) {
 	event.OnConnected = func(peer peer.IPeer) {
 		moduleManager.Range(func(key, value interface{}) bool {
 			m := value.(module.IModule)
@@ -91,7 +91,7 @@ func moduleConnectInitialize(event *socket.Event, moduleManager *module.ModuleMa
 	}
 }
 
-func moduleInitialize(service service.IService, moduleManager *module.ModuleManager) {
+func moduleInitialize(service service.IService, moduleManager *ModuleManager) {
 	moduleManager.Range(func(key, value interface{}) bool {
 		m := value.(module.IModule)
 		m.Initialize(service)

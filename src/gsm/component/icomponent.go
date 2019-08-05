@@ -1,5 +1,7 @@
 package component
 
 type IComponent interface {
-	GetName() string
+	GetObjectId() string
+
+	Update(name string, value interface{}) bool
 }

@@ -1,4 +1,4 @@
-package dispatcher
+package invoker
 
 import (
 	"bytes"
@@ -9,19 +9,19 @@ import (
 	"reflect"
 )
 
-type Dispatcher struct {
+type Invoker struct {
 	PreInvoke func() bool
 	EndInvoke func()
 	register  *rpc.RpcRegister
 }
 
-func NewDispatcher(register *rpc.RpcRegister) *Dispatcher {
-	return &Dispatcher{
+func NewInvoker(register *rpc.RpcRegister) *Invoker {
+	return &Invoker{
 		register: register,
 	}
 }
 
-func (dispatcher *Dispatcher) Dispatch(peer peer.IPeer, data []byte) {
+func (dispatcher *Invoker) Dispatch(peer peer.IPeer, data []byte) {
 	defer func() {
 		if r := recover(); r != nil {
 			logger.Log.Error("Recovered in %s", r)
@@ -39,7 +39,7 @@ func (dispatcher *Dispatcher) Dispatch(peer peer.IPeer, data []byte) {
 	method(peer, messageBytes, dataBytes)
 }
 
-func (dispatcher *Dispatcher) Register(
+func (dispatcher *Invoker) Register(
 	id interface{},
 	before func() interface{},
 	handle func() interface{},
@@ -120,7 +120,7 @@ func (dispatcher *Dispatcher) Register(
 	})
 }
 
-func (dispatcher *Dispatcher) RawRegister(
+func (dispatcher *Invoker) RawRegister(
 	id interface{},
 	before func(peer peer.IPeer, data []byte) bool,
 	handle func(peer peer.IPeer, data []byte) []byte,
@@ -139,18 +139,15 @@ func (dispatcher *Dispatcher) RawRegister(
 	idBytes := buf.Bytes()
 
 	dispatcher.register.AddRequest(idBytes, func(p peer.IPeer, methodId []byte, data []byte) {
+
+		if handle == nil || len(data) == 0 {
+			return
+		}
+
 		if before != nil {
 			if !before(p, data) {
 				return
 			}
-		}
-
-		if handle == nil {
-			return
-		}
-
-		if len(data) == 0 {
-			return
 		}
 
 		values := handle(p, data)
@@ -167,7 +164,7 @@ func (dispatcher *Dispatcher) RawRegister(
 	})
 }
 
-func (dispatcher *Dispatcher) Invoke(
+func (dispatcher *Invoker) Invoke(
 	id interface{},
 	p peer.IPeer,
 	args func() []interface{}) []interface{} {
@@ -211,7 +208,7 @@ func (dispatcher *Dispatcher) Invoke(
 		return nil
 	}
 
-	dataBytes := rpcInvoke.Request(idBytes)
+	dataBytes := rpcInvoke.Request(idBytes, args()...)
 	connection := p.GetConnection()
 	if connection != nil {
 		connection.Send(dataBytes)
@@ -229,7 +226,7 @@ func (dispatcher *Dispatcher) Invoke(
 	}
 }
 
-func (dispatcher *Dispatcher) AsyncInvoke(
+func (dispatcher *Invoker) AsyncInvoke(
 	id interface{},
 	p peer.IPeer,
 	args func() []interface{},
@@ -275,14 +272,14 @@ func (dispatcher *Dispatcher) AsyncInvoke(
 	}
 
 	rpcInvoke := rpc.NewRpcInvoke()
-	dataBytes := rpcInvoke.Request(idBytes)
+	dataBytes := rpcInvoke.Request(idBytes, args()...)
 	connection := p.GetConnection()
 	if connection != nil {
 		connection.Send(dataBytes)
 	}
 }
 
-func (dispatcher *Dispatcher) RawInvoke(
+func (dispatcher *Invoker) RawInvoke(
 	id interface{},
 	p peer.IPeer,
 	data []byte) []byte {
@@ -337,7 +334,7 @@ func (dispatcher *Dispatcher) RawInvoke(
 	}
 }
 
-func (dispatcher *Dispatcher) AsyncRawInvoke(
+func (dispatcher *Invoker) AsyncRawInvoke(
 	id interface{},
 	p peer.IPeer,
 	data []byte,

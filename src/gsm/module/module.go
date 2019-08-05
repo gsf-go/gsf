@@ -3,14 +3,15 @@ package module
 import (
 	"github.com/sf-go/gsf/src/gsc/serialization"
 	"github.com/sf-go/gsf/src/gsf/service"
+	"github.com/sf-go/gsf/src/gsm/component"
 	"github.com/sf-go/gsf/src/gsm/controller"
-	"github.com/sf-go/gsf/src/gsm/dispatcher"
+	"github.com/sf-go/gsf/src/gsm/invoker"
 	"github.com/sf-go/gsf/src/gsm/peer"
 )
 
 type Module struct {
 	controllers []controller.IController
-	dispatcher  dispatcher.IDispatcher
+	invoker     invoker.IInvoker
 }
 
 func NewModule() *Module {
@@ -23,12 +24,28 @@ func (module *Module) AddController(controller controller.IController) {
 	module.controllers = append(module.controllers, controller)
 }
 
-func (module *Module) AddModel(name string, generate func(name string, args ...interface{}) serialization.ISerializablePacket) {
-	serialization.PacketManagerInstance.AddPacket(name, generate)
+func (module *Module) AddModel(name string,
+	generate func(name string, peer peer.IPeer) serialization.ISerializablePacket) {
+	serialization.PacketManagerInstance.AddPacket(name,
+		func(name string, args ...interface{}) serialization.ISerializablePacket {
+			return generate(name, args[0].(peer.IPeer))
+		})
+}
+
+func (module *Module) AddComponent(name string,
+	generate func(name string, peer peer.IPeer) serialization.ISerializablePacket) {
+	serialization.PacketManagerInstance.AddPacket(name,
+		func(name string, args ...interface{}) serialization.ISerializablePacket {
+			return generate(name, args[0].(peer.IPeer))
+		})
+
+	module.invoker.Register(name, nil, func() interface{} {
+		return func(p peer.IPeer, component component.IComponent) {}
+	}, nil)
 }
 
 func (module *Module) Initialize(service service.IService) {
-
+	module.invoker = service.GetInvoker()
 }
 
 func (module *Module) InitializeFinish(service service.IService) {

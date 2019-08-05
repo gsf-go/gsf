@@ -7,14 +7,14 @@ import (
 	"github.com/sf-go/gsf/src/gsc/logger"
 	"github.com/sf-go/gsf/src/gsc/serialization"
 	"github.com/sf-go/gsf/src/gsf/service"
-	"github.com/sf-go/gsf/src/gsm/dispatcher"
+	"github.com/sf-go/gsf/src/gsm/invoker"
 	"github.com/sf-go/gsf/src/gsm/module"
 	"github.com/sf-go/gsf/src/gsm/peer"
 )
 
 type TestClientModule struct {
 	*module.Module
-	dispatcher dispatcher.IDispatcher
+	dispatcher invoker.IInvoker
 }
 
 func NewTestClientModule() *TestClientModule {
@@ -26,9 +26,9 @@ func NewTestClientModule() *TestClientModule {
 func (testModule *TestClientModule) Initialize(service service.IService) {
 	testModule.Module.Initialize(service)
 
-	testModule.dispatcher = service.GetDispatcher()
+	testModule.dispatcher = service.GetInvoker()
 	testModule.AddController(controllers.NewTestController(testModule.dispatcher))
-	testModule.AddModel("TestModel", func(name string, args ...interface{}) serialization.ISerializablePacket {
+	testModule.AddModel("TestModel", func(name string, peer peer.IPeer) serialization.ISerializablePacket {
 		return models.NewTestModel()
 	})
 	logger.Log.Debug("Initialize")

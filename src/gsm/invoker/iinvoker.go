@@ -1,8 +1,10 @@
-package dispatcher
+package invoker
 
-import "github.com/sf-go/gsf/src/gsm/peer"
+import (
+	"github.com/sf-go/gsf/src/gsm/peer"
+)
 
-type IDispatcher interface {
+type IInvoker interface {
 	Dispatch(peer peer.IPeer, data []byte)
 
 	Register(id interface{},

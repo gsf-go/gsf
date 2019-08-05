@@ -3,7 +3,7 @@ package service
 import (
 	"github.com/sf-go/gsf/src/gsc/network"
 	"github.com/sf-go/gsf/src/gsf/socket"
-	"github.com/sf-go/gsf/src/gsm/dispatcher"
+	"github.com/sf-go/gsf/src/gsm/invoker"
 	"github.com/sf-go/gsf/src/gsm/peer"
 	"sync"
 )
@@ -12,10 +12,10 @@ type ClientService struct {
 	clientSocket    socket.IClientSocket
 	event           *sync.Map
 	messageCallback []func(peer peer.IPeer, data []byte) bool
-	dispatcher      dispatcher.IDispatcher
+	dispatcher      invoker.IInvoker
 }
 
-func NewClientService(clientSocket socket.IClientSocket, dispatcher dispatcher.IDispatcher) *ClientService {
+func NewClientService(clientSocket socket.IClientSocket, dispatcher invoker.IInvoker) *ClientService {
 	return &ClientService{
 		clientSocket: clientSocket,
 		event:        new(sync.Map),
@@ -23,7 +23,7 @@ func NewClientService(clientSocket socket.IClientSocket, dispatcher dispatcher.I
 	}
 }
 
-func (service *ClientService) GetDispatcher() dispatcher.IDispatcher {
+func (service *ClientService) GetInvoker() invoker.IInvoker {
 	return service.dispatcher
 }
 

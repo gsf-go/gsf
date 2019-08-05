@@ -25,15 +25,17 @@ func NewUserComponent() *UserComponent {
 	return userComponent
 }
 
-func (userComponent *UserComponent) GetName() string {
+func (userComponent *UserComponent) GetObjectId() string {
 	return reflect.TypeOf(userComponent).Elem().Name()
 }
 
+func (userComponent *UserComponent) Setter(cpt IComponent) {
+
+}
 func TestComponent(t *testing.T) {
 
-	serialization.GetPacketManagerInstance().AddPacket("SerializablePacket",
-		func(args ...interface{}) serialization.ISerializablePacket {
-			name := args[0].(string)
+	serialization.PacketManagerInstance.AddPacket("SerializablePacket",
+		func(name string, args ...interface{}) serialization.ISerializablePacket {
 			p := args[1].(peer.IPeer)
 			return p.GetComponent(name).(serialization.ISerializablePacket)
 		})

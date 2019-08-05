@@ -24,15 +24,16 @@ func NewTestServerModule() *TestServerModule {
 func (testModule *TestServerModule) Initialize(service service.IService) {
 	testModule.Module.Initialize(service)
 
-	testModule.AddController(controllers.NewTestController(service.GetDispatcher()))
-	testModule.AddModel("TestModel", func(name string, args ...interface{}) serialization.ISerializablePacket {
-		return models.NewTestModel()
-	})
+	testModule.AddController(controllers.NewTestController(service.GetInvoker()))
+	testModule.AddModel("TestModel",
+		func(name string, peer peer.IPeer) serialization.ISerializablePacket {
+			return models.NewTestModel()
+		})
 
-	testModule.AddModel("UserComponent", func(name string, args ...interface{}) serialization.ISerializablePacket {
-		p := args[1].(peer.IPeer)
-		return p.GetComponent(name).(serialization.ISerializablePacket)
-	})
+	testModule.AddComponent("UserComponent",
+		func(name string, peer peer.IPeer) serialization.ISerializablePacket {
+			return peer.GetComponent(name).(serialization.ISerializablePacket)
+		})
 
 	logger.Log.Debug("Initialize")
 }
