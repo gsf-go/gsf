@@ -17,12 +17,12 @@ func NewRpcResponse() *RpcResponse {
 	return &RpcResponse{}
 }
 
-func (rpcResponse *RpcResponse) HandleMessageId(data []byte, args ...interface{}) ([]byte, []byte) {
+func (rpcResponse *RpcResponse) HandleMessageId(data []byte, args ...interface{}) (string, []byte) {
 	byteReader := bytestream.NewByteReader2(data)
 	deserializable := serialization.NewDeserializable(byteReader)
-	bytes := deserializable.DeserializeSingle(args...).Interface()
+	messageId := deserializable.DeserializeSingle(args...).String()
 	length := byteReader.GetUnreadLength()
-	return bytes.([]byte), data[len(data)-length:]
+	return messageId, data[len(data)-length:]
 }
 
 func (rpcResponse *RpcResponse) HandleData(data []byte, args ...interface{}) []reflect.Value {

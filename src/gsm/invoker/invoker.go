@@ -1,8 +1,6 @@
 package invoker
 
 import (
-	"bytes"
-	"encoding/gob"
 	"github.com/sf-go/gsf/src/gsc/logger"
 	"github.com/sf-go/gsf/src/gsc/rpc"
 	"github.com/sf-go/gsf/src/gsm/peer"
@@ -29,33 +27,25 @@ func (dispatcher *Invoker) Dispatch(peer peer.IPeer, data []byte) {
 	}()
 
 	response := rpc.NewRpcResponse()
-	messageBytes, dataBytes := response.HandleMessageId(data, peer)
-	method := dispatcher.register.GetRpcByName(messageBytes)
+	messageId, dataBytes := response.HandleMessageId(data, peer)
+	method := dispatcher.register.GetRpcByName(messageId)
 	if method == nil {
-		logger.Log.Error("没有注册ID:", string(messageBytes), "的RPC")
+		logger.Log.Error("没有注册ID:", messageId, "的RPC")
 		return
 	}
 
-	method(peer, messageBytes, dataBytes)
+	method(peer, messageId, dataBytes)
 }
 
 func (dispatcher *Invoker) Register(
-	id interface{},
+	id string,
 	before func() interface{},
 	handle func() interface{},
 	after func() interface{}) {
 
-	if id == nil || handle == nil {
+	if len(id) == 0 || handle == nil {
 		return
 	}
-
-	var buf bytes.Buffer
-	enc := gob.NewEncoder(&buf)
-	err := enc.Encode(id)
-	if err != nil {
-		return
-	}
-	idBytes := buf.Bytes()
 
 	// 获取IPeer特殊字段
 	method := reflect.ValueOf(handle())
@@ -80,7 +70,7 @@ func (dispatcher *Invoker) Register(
 		afterValue = reflect.ValueOf(after())
 	}
 
-	dispatcher.register.AddRequest(idBytes, func(p peer.IPeer, methodId []byte, data []byte) {
+	dispatcher.register.AddRequest(id, func(p peer.IPeer, methodId string, data []byte) {
 		response := rpc.NewRpcResponse()
 		result := response.HandleData(data, p)
 		if len(result) == 0 {
@@ -121,24 +111,16 @@ func (dispatcher *Invoker) Register(
 }
 
 func (dispatcher *Invoker) RawRegister(
-	id interface{},
+	id string,
 	before func(peer peer.IPeer, data []byte) bool,
 	handle func(peer peer.IPeer, data []byte) []byte,
 	after func(peer peer.IPeer, data []byte)) {
 
-	if id == nil || handle == nil {
+	if len(id) == 0 || handle == nil {
 		return
 	}
 
-	var buf bytes.Buffer
-	enc := gob.NewEncoder(&buf)
-	err := enc.Encode(id)
-	if err != nil {
-		return
-	}
-	idBytes := buf.Bytes()
-
-	dispatcher.register.AddRequest(idBytes, func(p peer.IPeer, methodId []byte, data []byte) {
+	dispatcher.register.AddRequest(id, func(p peer.IPeer, methodId string, data []byte) {
 
 		if handle == nil || len(data) == 0 {
 			return
@@ -165,28 +147,20 @@ func (dispatcher *Invoker) RawRegister(
 }
 
 func (dispatcher *Invoker) Invoke(
-	id interface{},
+	id string,
 	p peer.IPeer,
 	args func() []interface{}) []interface{} {
 
-	if id == nil {
+	if len(id) == 0 {
 		return nil
 	}
-
-	var buf bytes.Buffer
-	enc := gob.NewEncoder(&buf)
-	err := enc.Encode(id)
-	if err != nil {
-		return nil
-	}
-	idBytes := buf.Bytes()
 
 	resultChan := make(chan []interface{})
 	defer func() {
 		close(resultChan)
 	}()
 
-	dispatcher.register.AddResponse(idBytes, func(p peer.IPeer, method []byte, data []byte) {
+	dispatcher.register.AddResponse(id, func(p peer.IPeer, methodId string, data []byte) {
 
 		response := rpc.NewRpcResponse()
 		values := response.HandleData(data, p)
@@ -199,7 +173,7 @@ func (dispatcher *Invoker) Invoke(
 			res[i] = item.Interface()
 		}
 
-		dispatcher.register.RemoveResponse(idBytes)
+		dispatcher.register.RemoveResponse(methodId)
 		resultChan <- res
 	})
 
@@ -208,7 +182,7 @@ func (dispatcher *Invoker) Invoke(
 		return nil
 	}
 
-	dataBytes := rpcInvoke.Request(idBytes, args()...)
+	dataBytes := rpcInvoke.Request(id, args()...)
 	connection := p.GetConnection()
 	if connection != nil {
 		connection.Send(dataBytes)
@@ -227,24 +201,16 @@ func (dispatcher *Invoker) Invoke(
 }
 
 func (dispatcher *Invoker) AsyncInvoke(
-	id interface{},
+	id string,
 	p peer.IPeer,
 	args func() []interface{},
 	result func([]interface{})) {
 
-	if id == nil {
+	if len(id) == 0 {
 		return
 	}
 
-	var buf bytes.Buffer
-	enc := gob.NewEncoder(&buf)
-	err := enc.Encode(id)
-	if err != nil {
-		return
-	}
-
-	idBytes := buf.Bytes()
-	dispatcher.register.AddResponse(idBytes, func(_ peer.IPeer, methodId []byte, data []byte) {
+	dispatcher.register.AddResponse(id, func(_ peer.IPeer, methodId string, data []byte) {
 
 		response := rpc.NewRpcResponse()
 		values := response.HandleData(data, p)
@@ -257,7 +223,7 @@ func (dispatcher *Invoker) AsyncInvoke(
 			res[i] = item.Interface()
 		}
 
-		dispatcher.register.RemoveResponse(idBytes)
+		dispatcher.register.RemoveResponse(methodId)
 		if result != nil {
 			result(res)
 			if dispatcher.EndInvoke != nil {
@@ -267,12 +233,12 @@ func (dispatcher *Invoker) AsyncInvoke(
 	})
 
 	if dispatcher.PreInvoke != nil && !dispatcher.PreInvoke() {
-		dispatcher.register.RemoveResponse(idBytes)
+		dispatcher.register.RemoveResponse(id)
 		return
 	}
 
 	rpcInvoke := rpc.NewRpcInvoke()
-	dataBytes := rpcInvoke.Request(idBytes, args()...)
+	dataBytes := rpcInvoke.Request(id, args()...)
 	connection := p.GetConnection()
 	if connection != nil {
 		connection.Send(dataBytes)
@@ -280,43 +246,36 @@ func (dispatcher *Invoker) AsyncInvoke(
 }
 
 func (dispatcher *Invoker) RawInvoke(
-	id interface{},
+	id string,
 	p peer.IPeer,
 	data []byte) []byte {
 
-	if id == nil {
+	if len(id) == 0 {
 		return nil
 	}
 
-	var buf bytes.Buffer
-	enc := gob.NewEncoder(&buf)
-	err := enc.Encode(id)
-	if err != nil {
-		return nil
-	}
-	idBytes := buf.Bytes()
 	resultChan := make(chan []byte)
 	defer func() {
 		close(resultChan)
 	}()
 
 	rpcRegister := dispatcher.register
-	rpcRegister.AddResponse(idBytes, func(p peer.IPeer, methodId []byte, data []byte) {
+	rpcRegister.AddResponse(id, func(p peer.IPeer, methodId string, data []byte) {
 		if len(data) == 0 {
 			return
 		}
 
-		rpcRegister.RemoveResponse(idBytes)
+		rpcRegister.RemoveResponse(methodId)
 		resultChan <- data
 	})
 
 	if dispatcher.PreInvoke != nil && !dispatcher.PreInvoke() {
-		rpcRegister.RemoveResponse(idBytes)
+		rpcRegister.RemoveResponse(id)
 		return nil
 	}
 
 	rpcInvoke := rpc.NewRpcInvoke()
-	dataBytes := rpcInvoke.Request(idBytes)
+	dataBytes := rpcInvoke.Request(id)
 	connection := p.GetConnection()
 	if connection != nil {
 		connection.Send(append(dataBytes, data...))
@@ -335,29 +294,21 @@ func (dispatcher *Invoker) RawInvoke(
 }
 
 func (dispatcher *Invoker) AsyncRawInvoke(
-	id interface{},
+	id string,
 	p peer.IPeer,
 	data []byte,
 	result func(data []byte)) {
 
-	if id == nil {
+	if len(id) == 0 {
 		return
 	}
 
-	var buf bytes.Buffer
-	enc := gob.NewEncoder(&buf)
-	err := enc.Encode(id)
-	if err != nil {
-		return
-	}
-
-	idBytes := buf.Bytes()
-	dispatcher.register.AddResponse(idBytes, func(p peer.IPeer, methodId []byte, data []byte) {
+	dispatcher.register.AddResponse(id, func(p peer.IPeer, methodId string, data []byte) {
 		if len(data) == 0 {
 			return
 		}
 
-		dispatcher.register.RemoveResponse(idBytes)
+		dispatcher.register.RemoveResponse(methodId)
 		if result != nil {
 			result(data)
 			if dispatcher.EndInvoke != nil {
@@ -367,12 +318,12 @@ func (dispatcher *Invoker) AsyncRawInvoke(
 	})
 
 	if dispatcher.PreInvoke != nil && !dispatcher.PreInvoke() {
-		dispatcher.register.RemoveResponse(idBytes)
+		dispatcher.register.RemoveResponse(id)
 		return
 	}
 
 	rpcInvoke := rpc.NewRpcInvoke()
-	dataBytes := rpcInvoke.Request(idBytes)
+	dataBytes := rpcInvoke.Request(id)
 	connection := p.GetConnection()
 	if connection != nil {
 		connection.Send(append(dataBytes, data...))
