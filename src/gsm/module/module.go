@@ -36,28 +36,20 @@ func (module *Module) AddModel(name string,
 		})
 }
 
-func (module *Module) AddComponent(template component.IComponent,
-	generate func(name string, peer peer.IPeer) serialization.ISerializablePacket) {
+func (module *Module) AddComponent(template component.IComponent) {
 
 	name := template.GetObjectId()
-	serialization.PacketManagerInstance.AddPacket(name,
-		func(name string, args ...interface{}) serialization.ISerializablePacket {
-			return generate(name, args[0].(peer.IPeer))
+	module.invoker.FixRegister("Get_"+name,
+		func(peer peer.IPeer, args ...interface{}) []interface{} {
+			return peer.GetComponent(name).Getter(args[0].(string))
 		})
 
-	module.invoker.Register("Get_"+name, nil, func() interface{} {
-		return func(peer peer.IPeer, version string) []interface{} {
-			return peer.GetComponent(name).Getter(version)
-		}
-	}, nil)
-
-	module.invoker.Register("Set_"+name, nil, func() interface{} {
-		return func(peer peer.IPeer) []interface{} {
+	module.invoker.FixRegister("Set_"+name,
+		func(peer peer.IPeer, args ...interface{}) []interface{} {
 			return []interface{}{
-				peer.GetComponent(name).Update(),
+				peer.GetComponent(name).Setter(args...),
 			}
-		}
-	}, nil)
+		})
 }
 
 func (module *Module) Initialize(service service.IService) {

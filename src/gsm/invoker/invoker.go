@@ -110,6 +110,36 @@ func (dispatcher *Invoker) Register(
 	})
 }
 
+func (dispatcher *Invoker) FixRegister(
+	id string,
+	handle func(peer peer.IPeer,
+		args ...interface{}) []interface{}) {
+
+	if len(id) == 0 || handle == nil {
+		return
+	}
+
+	dispatcher.register.AddRequest(id, func(p peer.IPeer, id string, data []byte) {
+		response := rpc.NewRpcResponse()
+		args := response.HandleData(data, p)
+		if len(args) == 0 {
+			return
+		}
+
+		tmp := make([]interface{}, 0)
+		for _, v := range args {
+			tmp = append(tmp, v.Interface())
+		}
+		result := handle(p, tmp...)
+		invoke := rpc.NewRpcInvoke()
+		dataBytes := invoke.Request(dispatcher.register.GetResponseId(id), result...)
+		connection := p.GetConnection()
+		if connection != nil {
+			connection.Send(dataBytes)
+		}
+	})
+}
+
 func (dispatcher *Invoker) RawRegister(
 	id string,
 	before func(peer peer.IPeer, data []byte) bool,

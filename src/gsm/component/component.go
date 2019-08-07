@@ -1,7 +1,6 @@
 package component
 
 import (
-	"github.com/sf-go/gsf/src/gsc/serialization"
 	"reflect"
 	"strconv"
 	"strings"
@@ -28,7 +27,7 @@ func (component *Component) GetObjectId() string {
 	return component.objectId
 }
 
-func (component *Component) Setter(name string, value interface{}) bool {
+func (component *Component) Verify(name string, value interface{}) bool {
 	return true
 }
 
@@ -47,36 +46,30 @@ func (component *Component) Getter(version string) []interface{} {
 	return tmp
 }
 
-func (component *Component) Update() bool {
-	return true
-}
-
-func (component *Component) ToBinaryWriter(writer serialization.ISerializable) []byte {
-	values := make([]interface{}, 0)
-
-	for k, v := range component.record {
-		values = append(values, k, v)
-	}
-	component.Clear()
-	return writer.Serialize(values...)
-}
-
-func (component *Component) FromBinaryReader(reader serialization.IDeserializable) {
-
-	values := reader.Deserialize()
-	length := len(values)
-
+func (component *Component) Setter(args ...interface{}) bool {
+	length := len(args)
 	for i := 0; i < length; i += 2 {
-		tmp := values[i].Interface().(string)
+		tmp := args[i].(string)
 		splits := strings.Split(tmp, "_")
 		name := splits[0]
 		version, _ := strconv.Atoi(splits[1])
-		value := values[i+1].Interface()
-		if version > component.version[name] && component.Setter(name, values) {
+		value := args[i+1]
+		if version > component.version[name] && component.Verify(name, value) {
 			component.SetValue(name, value)
 		}
 	}
+	return true
 }
+
+//func (component *Component) ToBinaryWriter(writer serialization.ISerializable) []byte {
+//	values := make([]interface{}, 0)
+//
+//	for k, v := range component.record {
+//		values = append(values, k, v)
+//	}
+//	component.Clear()
+//	return writer.Serialize(values...)
+//}
 
 func (component *Component) Register(obj interface{}) {
 

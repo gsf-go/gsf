@@ -16,8 +16,8 @@ func NewUserComponent() *UserComponent {
 		Component: component.NewComponent(),
 	}
 	userComponent.Register(userComponent)
-	userComponent.SetValue("Account", "111111")
-	userComponent.SetValue("Password", "222222")
+	userComponent.SetValue("Account", "123456")
+	userComponent.SetValue("Password", "456789")
 	return userComponent
 }
 

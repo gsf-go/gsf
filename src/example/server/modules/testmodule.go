@@ -30,10 +30,7 @@ func (testModule *TestServerModule) Initialize(service service.IService) {
 			return models.NewTestModel()
 		})
 
-	testModule.AddComponent(components.NewUserComponent(),
-		func(name string, peer peer.IPeer) serialization.ISerializablePacket {
-			return peer.GetComponent(name).(serialization.ISerializablePacket)
-		})
+	testModule.AddComponent(components.NewUserComponent())
 
 	logger.Log.Debug("Initialize")
 }

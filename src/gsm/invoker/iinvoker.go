@@ -17,6 +17,9 @@ type IInvoker interface {
 		handle func(peer peer.IPeer, data []byte) []byte,
 		After func(peer peer.IPeer, data []byte))
 
+	FixRegister(id string,
+		handle func(peer peer.IPeer, args ...interface{}) []interface{})
+
 	Invoke(id string,
 		peer peer.IPeer,
 		function func() []interface{}) []interface{}
