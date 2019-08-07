@@ -34,24 +34,21 @@ func (component *Component) Setter(name string, value interface{}) bool {
 
 func (component *Component) Getter(version string) []interface{} {
 	splits := strings.Split(version, "_")
-	length := len(splits) / 2
-	remoteVersion := make(map[string]int)
+	length := len(splits)
 	tmp := make([]interface{}, 0)
 	for i := 0; i < length; i += 2 {
 		name := splits[i]
 		ver, _ := strconv.Atoi(splits[i+1])
-		remoteVersion[name] = ver
-
 		if component.version[name] > ver {
 			tmp = append(tmp, name+"_"+strconv.Itoa(component.version[name]))
-			tmp = append(tmp, component.fields[name])
+			tmp = append(tmp, component.fields[name].Interface())
 		}
 	}
 	return tmp
 }
 
-func (component *Component) Update() {
-
+func (component *Component) Update() bool {
+	return true
 }
 
 func (component *Component) ToBinaryWriter(writer serialization.ISerializable) []byte {
@@ -67,7 +64,7 @@ func (component *Component) ToBinaryWriter(writer serialization.ISerializable) [
 func (component *Component) FromBinaryReader(reader serialization.IDeserializable) {
 
 	values := reader.Deserialize()
-	length := len(values) / 2
+	length := len(values)
 
 	for i := 0; i < length; i += 2 {
 		tmp := values[i].Interface().(string)

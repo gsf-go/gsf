@@ -46,14 +46,16 @@ func (module *Module) AddComponent(template component.IComponent,
 		})
 
 	module.invoker.Register("Get_"+name, nil, func() interface{} {
-		return func(peer peer.IPeer, version string) {
-			peer.GetComponent(name).Getter(version)
+		return func(peer peer.IPeer, version string) []interface{} {
+			return peer.GetComponent(name).Getter(version)
 		}
 	}, nil)
 
 	module.invoker.Register("Set_"+name, nil, func() interface{} {
-		return func(peer peer.IPeer) {
-			peer.GetComponent(name).Update()
+		return func(peer peer.IPeer) []interface{} {
+			return []interface{}{
+				peer.GetComponent(name).Update(),
+			}
 		}
 	}, nil)
 }

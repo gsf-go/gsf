@@ -6,5 +6,5 @@ type IComponent interface {
 	Getter(version string) []interface{}
 	Setter(name string, value interface{}) bool
 
-	Update()
+	Update() bool
 }

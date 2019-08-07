@@ -16,15 +16,11 @@ func NewUserComponent() *UserComponent {
 		Component: component.NewComponent(),
 	}
 	userComponent.Register(userComponent)
+	userComponent.SetValue("Account", "111111")
+	userComponent.SetValue("Password", "222222")
 	return userComponent
 }
 
 func (component *UserComponent) GetObjectId() string {
 	return "User"
 }
-
-//func (component *UserComponent) Setter(cpt component.IComponent) {
-//	userComponent := cpt.(*UserComponent)
-//	component.Account = userComponent.Account
-//	component.Password = userComponent.Password
-//}
