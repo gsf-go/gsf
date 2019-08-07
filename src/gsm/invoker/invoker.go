@@ -77,9 +77,9 @@ func (dispatcher *Invoker) Register(
 			return
 		}
 
-		if index > 0 {
-			result = append(result, make([]reflect.Value, 1)...)
-			result = append(result[:index], result[index:]...)
+		if index >= 0 {
+			result = append(result, reflect.ValueOf(nil))
+			copy(result[index+1:], result[index:len(result)-1])
 			result[index] = reflect.ValueOf(p)
 		}
 

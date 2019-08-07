@@ -28,8 +28,30 @@ func (component *Component) GetObjectId() string {
 	return component.objectId
 }
 
-func (component *Component) UpdateField(name string, value interface{}) bool {
+func (component *Component) Setter(name string, value interface{}) bool {
 	return true
+}
+
+func (component *Component) Getter(version string) []interface{} {
+	splits := strings.Split(version, "_")
+	length := len(splits) / 2
+	remoteVersion := make(map[string]int)
+	tmp := make([]interface{}, 0)
+	for i := 0; i < length; i += 2 {
+		name := splits[i]
+		ver, _ := strconv.Atoi(splits[i+1])
+		remoteVersion[name] = ver
+
+		if component.version[name] > ver {
+			tmp = append(tmp, name+"_"+strconv.Itoa(component.version[name]))
+			tmp = append(tmp, component.fields[name])
+		}
+	}
+	return tmp
+}
+
+func (component *Component) Update() {
+
 }
 
 func (component *Component) ToBinaryWriter(writer serialization.ISerializable) []byte {
@@ -43,29 +65,17 @@ func (component *Component) ToBinaryWriter(writer serialization.ISerializable) [
 }
 
 func (component *Component) FromBinaryReader(reader serialization.IDeserializable) {
+
 	values := reader.Deserialize()
-	// Getter
-	version := values[0].Interface().(string)
-	splits := strings.Split(version, "_")
-	length := len(splits) / 2
-	remoteVersion := make(map[string]int)
-	for i := 0; i < length; i += 2 {
-		name := values[i].Interface().(string)
-		ver, _ := strconv.Atoi(values[i+1].Interface().(string))
-		remoteVersion[name] = ver
+	length := len(values) / 2
 
-		if len(values) == 1 && component.version[name] > ver {
-			component.record[name] = component.fields[name]
-		}
-	}
-
-	// Setter
-	values = values[1:]
-	length = len(values) / 2
 	for i := 0; i < length; i += 2 {
-		name := values[i].Interface().(string)
+		tmp := values[i].Interface().(string)
+		splits := strings.Split(tmp, "_")
+		name := splits[0]
+		version, _ := strconv.Atoi(splits[1])
 		value := values[i+1].Interface()
-		if remoteVersion[name] > component.version[name] && component.UpdateField(name, values) {
+		if version > component.version[name] && component.Setter(name, values) {
 			component.SetValue(name, value)
 		}
 	}

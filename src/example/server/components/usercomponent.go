@@ -20,11 +20,11 @@ func NewUserComponent() *UserComponent {
 }
 
 func (component *UserComponent) GetObjectId() string {
-	return "UserComponent"
+	return "User"
 }
 
-func (component *UserComponent) Setter(cpt component.IComponent) {
-	userComponent := cpt.(*UserComponent)
-	component.Account = userComponent.Account
-	component.Password = userComponent.Password
-}
+//func (component *UserComponent) Setter(cpt component.IComponent) {
+//	userComponent := cpt.(*UserComponent)
+//	component.Account = userComponent.Account
+//	component.Password = userComponent.Password
+//}
