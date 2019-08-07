@@ -3,23 +3,24 @@ package peer
 import (
 	"github.com/sf-go/gsf/src/gsc/network"
 	"github.com/sf-go/gsf/src/gsm/component"
-	"sync"
 )
 
 type Peer struct {
 	connection network.IConnection
-	components *sync.Map
+	components map[string]component.IComponent
 }
 
 func (peer *Peer) Range(foreach func(key string, component component.IComponent) bool) {
-	peer.components.Range(func(key, value interface{}) bool {
-		return foreach(key.(string), value.(component.IComponent))
-	})
+	for key, value := range peer.components {
+		if !foreach(key, value) {
+			break
+		}
+	}
 }
 
 func NewPeer() *Peer {
 	return &Peer{
-		components: new(sync.Map),
+		components: make(map[string]component.IComponent),
 	}
 }
 
@@ -32,22 +33,22 @@ func (peer *Peer) SetConnection(connection network.IConnection) {
 }
 
 func (peer *Peer) AddComponent(component component.IComponent) {
-	peer.components.Store(component.GetObjectId(), component)
+	peer.components[component.GetObjectId()] = component
 }
 
 func (peer *Peer) GetComponent(componentName string) component.IComponent {
-	cpt, ok := peer.components.Load(componentName)
+	cpt, ok := peer.components[componentName]
 	if ok {
-		return cpt.(component.IComponent)
+		return cpt
 	}
 	return nil
 }
 
 func (peer *Peer) RemoveComponent(componentName string) {
-	peer.components.Delete(componentName)
+	delete(peer.components, componentName)
 }
 
 func (peer *Peer) HasComponent(componentName string) bool {
-	_, ok := peer.components.Load(componentName)
+	_, ok := peer.components[componentName]
 	return ok
 }

@@ -20,6 +20,10 @@ func NewModule() *Module {
 	}
 }
 
+func (module *Module) GetInvoker() invoker.IInvoker {
+	return module.invoker
+}
+
 func (module *Module) AddController(controller controller.IController) {
 	module.controllers = append(module.controllers, controller)
 }
@@ -40,7 +44,7 @@ func (module *Module) AddComponent(name string,
 		})
 
 	module.invoker.Register(name, nil, func() interface{} {
-		return func(p peer.IPeer, component component.IComponent) {}
+		return func(peer peer.IPeer, component component.IComponent) {}
 	}, nil)
 }
 

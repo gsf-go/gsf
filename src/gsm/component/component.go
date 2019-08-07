@@ -16,18 +16,19 @@ type Component struct {
 }
 
 func NewComponent() *Component {
-	return &Component{
+	component := &Component{
 		fields:  make(map[string]reflect.Value),
 		version: make(map[string]int),
 		record:  make(map[string]interface{}),
 	}
+	return component
 }
 
 func (component *Component) GetObjectId() string {
 	return component.objectId
 }
 
-func (component *Component) Update(name string, value interface{}) bool {
+func (component *Component) UpdateField(name string, value interface{}) bool {
 	return true
 }
 
@@ -64,7 +65,7 @@ func (component *Component) FromBinaryReader(reader serialization.IDeserializabl
 	for i := 0; i < length; i += 2 {
 		name := values[i].Interface().(string)
 		value := values[i+1].Interface()
-		if remoteVersion[name] > component.version[name] && component.Update(name, values) {
+		if remoteVersion[name] > component.version[name] && component.UpdateField(name, values) {
 			component.SetValue(name, value)
 		}
 	}
