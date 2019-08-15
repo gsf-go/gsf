@@ -1,6 +1,7 @@
 package rpc
 
 import (
+	"github.com/sf-go/gsf/src/gsc/bytestream"
 	"github.com/sf-go/gsf/src/gsc/serialization"
 	"github.com/sf-go/gsf/src/gsm/peer"
 	"reflect"
@@ -21,24 +22,10 @@ func NewRpcInvoke() *RpcInvoke {
 	}
 }
 
-//func (rpcInvoke *RpcInvoke) Invoke(methodId []byte, peer peer.IPeer, args ...interface{}) []reflect.Value {
-//
-//	method := rpcInvoke.register.GetRpcByName(string(methodId))
-//	values := make([]reflect.Value, len(args))
-//
-//	for i, item := range args {
-//		v := reflect.ValueOf(item)
-//		values[i] = v
-//	}
-//
-//	return method(peer,  ,values)
-//}
-
 func (rpcInvoke *RpcInvoke) Request(methodId string, args ...interface{}) []byte {
-	methodIdBytes := rpcInvoke.serializable.SerializeSingle(methodId)
 	dataBytes := rpcInvoke.serializable.Serialize(args...)
-	buffer := make([]byte, 0, len(methodIdBytes)+len(dataBytes))
-	buffer = append(buffer, methodIdBytes...)
-	buffer = append(buffer, dataBytes...)
-	return buffer
+	writer := bytestream.NewByteWriter3()
+	writer.Write(methodId)
+	writer.Write(dataBytes)
+	return writer.ToBytes()
 }

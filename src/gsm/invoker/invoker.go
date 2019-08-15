@@ -27,7 +27,7 @@ func (dispatcher *Invoker) Dispatch(peer peer.IPeer, data []byte) {
 	}()
 
 	response := rpc.NewRpcResponse()
-	messageId, dataBytes := response.HandleMessageId(data, peer)
+	messageId, dataBytes := response.Split(data, peer)
 	method := dispatcher.register.GetRpcByName(messageId)
 	if method == nil {
 		logger.Log.Error("没有注册ID:", messageId, "的RPC")
@@ -151,7 +151,6 @@ func (dispatcher *Invoker) RawRegister(
 	}
 
 	dispatcher.register.AddRequest(id, func(p peer.IPeer, methodId string, data []byte) {
-
 		if handle == nil || len(data) == 0 {
 			return
 		}
@@ -161,7 +160,6 @@ func (dispatcher *Invoker) RawRegister(
 				return
 			}
 		}
-
 		values := handle(p, data)
 		if after != nil {
 			after(p, data)

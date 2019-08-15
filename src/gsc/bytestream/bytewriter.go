@@ -57,8 +57,8 @@ func (byteWriter *ByteWriter) Write(data interface{}) {
 			panic(err)
 		}
 
-		bytes := []byte(data)
-		err = binary.Write(byteWriter.buffer, byteWriter.Order, bytes)
+		buffer := []byte(data)
+		err = binary.Write(byteWriter.buffer, byteWriter.Order, buffer)
 		if err != nil {
 			panic(err)
 		}
@@ -69,8 +69,8 @@ func (byteWriter *ByteWriter) Write(data interface{}) {
 			panic(err)
 		}
 
-		bytes := []byte(*data)
-		err = binary.Write(byteWriter.buffer, byteWriter.Order, bytes)
+		buffer := []byte(*data)
+		err = binary.Write(byteWriter.buffer, byteWriter.Order, buffer)
 		if err != nil {
 			panic(err)
 		}
@@ -83,8 +83,8 @@ func (byteWriter *ByteWriter) Write(data interface{}) {
 			panic(err)
 		}
 
-		bytes := []byte(data)
-		err = binary.Write(byteWriter.buffer, byteWriter.Order, bytes)
+		buffer := []byte(data)
+		err = binary.Write(byteWriter.buffer, byteWriter.Order, buffer)
 		if err != nil {
 			panic(err)
 		}

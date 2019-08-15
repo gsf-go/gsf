@@ -41,13 +41,13 @@ func (module *Module) AddComponent(template component.IComponent) {
 	name := template.GetObjectId()
 	module.invoker.FixRegister("Get_"+name,
 		func(peer peer.IPeer, args ...interface{}) []interface{} {
-			return peer.GetComponent(name).Getter(args[0].(string))
+			return peer.GetComponent(name).GetterCallback(args[0].(string))
 		})
 
 	module.invoker.FixRegister("Set_"+name,
 		func(peer peer.IPeer, args ...interface{}) []interface{} {
 			return []interface{}{
-				peer.GetComponent(name).Setter(args...),
+				peer.GetComponent(name).SetterCallback(args...),
 			}
 		})
 }

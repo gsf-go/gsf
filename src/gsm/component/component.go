@@ -23,6 +23,17 @@ func NewComponent() *Component {
 	return component
 }
 
+func (component *Component) Synchronize() (string, []interface{}) {
+	values := make([]interface{}, 0)
+
+	for name, value := range component.record {
+		values = append(values, name+"_"+strconv.Itoa(component.version[name]))
+		values = append(values, value)
+	}
+	component.Clear()
+	return "Get_" + component.objectId, values
+}
+
 func (component *Component) GetObjectId() string {
 	return component.objectId
 }
@@ -31,7 +42,7 @@ func (component *Component) Verify(name string, value interface{}) bool {
 	return true
 }
 
-func (component *Component) Getter(version string) []interface{} {
+func (component *Component) GetterCallback(version string) []interface{} {
 	splits := strings.Split(version, "_")
 	length := len(splits)
 	tmp := make([]interface{}, 0)
@@ -46,7 +57,7 @@ func (component *Component) Getter(version string) []interface{} {
 	return tmp
 }
 
-func (component *Component) Setter(args ...interface{}) bool {
+func (component *Component) SetterCallback(args ...interface{}) bool {
 	length := len(args)
 	for i := 0; i < length; i += 2 {
 		tmp := args[i].(string)
@@ -55,21 +66,14 @@ func (component *Component) Setter(args ...interface{}) bool {
 		version, _ := strconv.Atoi(splits[1])
 		value := args[i+1]
 		if version > component.version[name] && component.Verify(name, value) {
-			component.SetValue(name, value)
+			field, ok := component.fields[name]
+			if ok {
+				field.Set(reflect.ValueOf(value))
+			}
 		}
 	}
 	return true
 }
-
-//func (component *Component) ToBinaryWriter(writer serialization.ISerializable) []byte {
-//	values := make([]interface{}, 0)
-//
-//	for k, v := range component.record {
-//		values = append(values, k, v)
-//	}
-//	component.Clear()
-//	return writer.Serialize(values...)
-//}
 
 func (component *Component) Register(obj interface{}) {
 

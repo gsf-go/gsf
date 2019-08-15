@@ -3,6 +3,7 @@ package component
 type IComponent interface {
 	GetObjectId() string
 
-	Getter(version string) []interface{}
-	Setter(args ...interface{}) bool
+	GetterCallback(version string) []interface{}
+	SetterCallback(args ...interface{}) bool
+	Synchronize() (string, []interface{})
 }
